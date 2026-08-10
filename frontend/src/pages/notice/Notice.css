@@ -1,0 +1,107 @@
+.notice-container {
+  padding: 20px;
+}
+
+.notice-container h1 {
+  margin-bottom: 25px;
+  color: #1e293b;
+}
+
+.notice-card {
+  background: white;
+  padding: 25px;
+  border-radius: 18px;
+  margin-bottom: 20px;
+
+  box-shadow:
+    0 10px 25px rgba(0,0,0,0.06);
+
+  transition: 0.3s;
+}
+
+.notice-card:hover {
+  transform: translateY(-4px);
+}
+
+.notice-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-bottom: 15px;
+}
+
+.notice-header h3 {
+  color: #1e293b;
+  font-size: 24px;
+}
+
+.notice-date {
+  background: #eff6ff;
+  color: #2563eb;
+
+  padding: 6px 12px;
+  border-radius: 20px;
+
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.notice-message {
+  color: #475569;
+  line-height: 1.7;
+  font-size: 16px;
+}
+
+.notice-empty {
+  background: white;
+  padding: 40px;
+  border-radius: 18px;
+
+  text-align: center;
+  color: gray;
+}
+
+.notice-form {
+  background: white;
+  padding: 20px;
+  border-radius: 18px;
+  margin-bottom: 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+}
+
+.notice-form input,
+.notice-form textarea {
+  padding: 12px;
+  border: 1px solid #dbe2ea;
+  border-radius: 10px;
+  font-size: 15px;
+}
+
+.notice-form textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.notice-form button {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.delete-btn {
+  margin-top: 15px;
+  background: #ef4444;
+  color: white;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+}

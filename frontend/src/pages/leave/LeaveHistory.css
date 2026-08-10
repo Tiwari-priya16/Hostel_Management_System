@@ -1,0 +1,50 @@
+.leave-history-container {
+  background: white;
+  padding: 25px;
+  border-radius: 15px;
+  margin-top: 20px;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+}
+
+.leave-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.leave-table th,
+.leave-table td {
+  padding: 15px;
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+}
+
+.status {
+  padding: 6px 12px;
+  border-radius: 20px;
+  color: white;
+}
+
+.pending {
+  background: orange;
+}
+
+.approved {
+  background: green;
+}
+
+.rejected {
+  background: red;
+}
+
+.booked {
+  background: #2563eb;
+}
+
+.completed {
+  background: green;
+}
+
+.cancelled {
+  background: red;
+}

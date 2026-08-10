@@ -1,0 +1,30 @@
+.feedback-group {
+  margin-top: 20px;
+}
+
+.feedback-group label {
+  display: block;
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.rating-stars {
+  display: flex;
+  gap: 12px;
+}
+
+.star {
+  font-size: 34px;
+  cursor: pointer;
+  opacity: 0.35;
+  transition: all 0.2s ease;
+}
+
+.star.active {
+  opacity: 1;
+}
+
+.star:hover {
+  transform: scale(1.2);
+}

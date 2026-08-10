@@ -1,0 +1,195 @@
+/* ==============================
+   Dashboard Layout
+============================== */
+
+.dashboard-container {
+  display: flex;
+  min-height: 100vh;
+  background: #eef2f7;
+}
+
+/* ==============================
+   Main Content
+============================== */
+
+.content {
+  flex: 1;
+  padding: 18px 22px;
+  background: #eef2f7;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ==============================
+   Welcome Heading
+============================== */
+
+.welcome-text {
+  margin: 25px 0 30px;
+  color: #1e293b;
+  font-size: 2.3rem;
+  font-weight: 700;
+}
+
+/* ==============================
+   Cards Grid
+============================== */
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(245px, 1fr));
+  gap: 24px;
+}
+
+/* ==============================
+   Dashboard Card
+============================== */
+
+.card {
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 28px 24px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.08);
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  min-height: 145px;
+}
+
+/* Left Colored Border */
+
+.card:nth-child(1) {
+  border-left: 5px solid #ff4d4f;
+}
+
+.card:nth-child(2) {
+  border-left: 5px solid #22c55e;
+}
+
+.card:nth-child(3) {
+  border-left: 5px solid #f59e0b;
+}
+
+.card:nth-child(4) {
+  border-left: 5px solid #3b82f6;
+}
+
+.card:nth-child(5) {
+  border-left: 5px solid #8b5cf6;
+}
+
+.card:nth-child(6) {
+  border-left: 5px solid #06b6d4;
+}
+
+/* Hover */
+
+.card:hover {
+  transform: translateY(-7px);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.12);
+}
+
+/* ==============================
+   Card Heading
+============================== */
+
+.card h3 {
+  margin: 0;
+  color: #1e293b;
+  font-size: 1.3rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* ==============================
+   Card Number
+============================== */
+
+.card p {
+  margin-top: 18px;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #2563eb;
+}
+
+/* ==============================
+   Responsive
+============================== */
+
+@media (max-width: 1200px) {
+  .cards {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  }
+}
+
+@media (max-width: 992px) {
+  .content {
+    padding: 18px;
+  }
+
+  .welcome-text {
+    font-size: 2rem;
+  }
+
+  .cards {
+    gap: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-container {
+    flex-direction: column;
+  }
+
+  .content {
+    padding: 15px;
+  }
+
+  .cards {
+    grid-template-columns: 1fr;
+  }
+
+  .welcome-text {
+    font-size: 1.8rem;
+    text-align: center;
+  }
+
+  .card {
+    min-height: 130px;
+  }
+
+  .card h3 {
+    font-size: 1.15rem;
+  }
+
+  .card p {
+    font-size: 2.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .content {
+    padding: 12px;
+  }
+
+  .welcome-text {
+    font-size: 1.5rem;
+  }
+
+  .card {
+    padding: 22px 18px;
+  }
+
+  .card h3 {
+    font-size: 1rem;
+  }
+
+  .card p {
+    font-size: 2rem;
+  }
+}
