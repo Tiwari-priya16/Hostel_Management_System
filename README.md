@@ -241,9 +241,9 @@ This project is intended for educational purposes.
 
 ## 👨‍💻 Developer
 
-**Deepak Brahman**
+**Priya Tiwari**
 
-GitHub: https://github.com/DeepakMaindola/
+GitHub: https://github.com/Tiwari-priya16/
 
 ---
 
