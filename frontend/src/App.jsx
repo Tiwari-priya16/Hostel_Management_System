@@ -228,15 +228,6 @@ function App() {
       path="/admin/notices"
       element={
         <ProtectedRoute>
-          <NoticeList />
-        </ProtectedRoute>
-      }
-    />
-
-    <Route
-      path="/admin/notices"
-      element={
-        <ProtectedRoute>
           <AdminNotice />
         </ProtectedRoute>
       }
