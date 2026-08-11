@@ -81,7 +81,7 @@ hostel-management-system/
 ### 1. Clone the Repository
 
 ```bash
-(https://github.com/DeepakMaindola/Hostel-management-System.git)
+(https://github.com/Tiwari-priya16/Hostel-management-System.git)
 ```
 
 ```bash
