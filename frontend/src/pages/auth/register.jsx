@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { registerUser } from "../../services/authService";
-import logo from "../../assets/homies4u-logo.jpeg";
+import logo from "../../assets/hostelsync-logo.png";
 import "./auth.css";
 
 function Register() {
@@ -98,7 +98,7 @@ function Register() {
       <div className="auth-card">
         <img
           src={logo}
-          alt="Homies4U"
+          alt="HostelSync"
           className="auth-logo"
         />
 
@@ -106,7 +106,7 @@ function Register() {
 
         <p>
           Register to access
-          Homies4U Hostel
+          HostelSync Hostel
           Management System
         </p>
 

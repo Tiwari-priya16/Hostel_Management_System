@@ -1,6 +1,6 @@
 import React from "react";
 import "./Navbar.css";
-import logo from "../../assets/homies4u-logo.jpeg";
+import logo from "../../assets/hostelsync-logo.png";
 
 function Navbar() {
   const user = JSON.parse(
@@ -12,7 +12,7 @@ function Navbar() {
       <div className="navbar-brand">
         <img
           src={logo}
-          alt="Homies4U"
+          alt="HostelSync"
           className="navbar-logo"
         />
       </div>

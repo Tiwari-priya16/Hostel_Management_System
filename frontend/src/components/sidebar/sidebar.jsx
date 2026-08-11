@@ -35,11 +35,11 @@ function Sidebar() {
       <div className="sidebar-logo">
         <img
           src={hLogo}
-          alt="Homies4U"
+          alt="HostelSync"
           className="sidebar-logo-img"
         />
 
-        <h2>Homies4U</h2>
+        <h2>HostelSync</h2>
       </div>
       {/* Dashboard */}
       <NavLink

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginUser } from "../../services/authService";
-import logo from "../../assets/homies4u-logo.jpeg";
+import logo from "../../assets/hostelsync-logo.png";
 
 function Login() {
 
@@ -51,7 +51,7 @@ function Login() {
     <div className="auth-card">
       <img
         src={logo}
-        alt="Homies4U"
+        alt="HostelSync"
         className="auth-logo"
       />
 

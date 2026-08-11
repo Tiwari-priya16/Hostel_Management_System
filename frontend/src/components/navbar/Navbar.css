@@ -1,5 +1,5 @@
 .navbar {
-  height: 70px;
+  height: 80px;
   background: white;
   padding: 0 25px;
 
@@ -22,7 +22,7 @@
 }
 
 .navbar-logo {
-  height: 50px;
+  height: 80px;
   width: auto;
   object-fit: contain;
 }
