@@ -95,6 +95,8 @@ function Register() {
 
   return (
     <div className="auth-container">
+      <div className="auth-orb auth-orb-one"></div>
+      <div className="auth-orb auth-orb-two"></div>
       <div className="auth-card">
         <img
           src={logo}

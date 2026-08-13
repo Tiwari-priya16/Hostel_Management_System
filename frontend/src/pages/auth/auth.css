@@ -1,5 +1,20 @@
+/* * {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100%;
+}
+
 .auth-container {
   min-height: 100vh;
+  width:100%;
+
   display: flex;
   justify-content: center;
   align-items: center;
@@ -9,6 +24,8 @@
     #0f172a,
     #1e293b
   );
+
+  padding: 20px;
 }
 
 .auth-card {
@@ -82,4 +99,362 @@
   cursor: pointer;
   margin-left: 5px;
   font-weight: 600;
+} */
+
+
+/* =========================================
+   GLOBAL RESET
+========================================= */
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+
+  width: 100%;
+  min-height: 100%;
+}
+
+
+/* =========================================
+   AUTH PAGE BACKGROUND
+========================================= */
+
+.auth-container {
+  min-height: 100vh;
+  width: 100%;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  position: relative;
+  overflow: hidden;
+
+  padding: 30px;
+
+  background:
+    radial-gradient(
+      circle at 15% 20%,
+      rgba(37, 99, 235, 0.22),
+      transparent 32%
+    ),
+    radial-gradient(
+      circle at 85% 80%,
+      rgba(14, 165, 233, 0.16),
+      transparent 32%
+    ),
+    linear-gradient(
+      135deg,
+      #06142e 0%,
+      #0b1f3f 50%,
+      #06152f 100%
+    );
+}
+
+
+/* =========================================
+   DECORATIVE BACKGROUND ORBS
+========================================= */
+
+.auth-orb {
+  position: absolute;
+
+  border-radius: 50%;
+
+  pointer-events: none;
+}
+
+.auth-orb-one {
+  width: 500px;
+  height: 500px;
+
+  top: -280px;
+  left: -200px;
+
+  background: rgba(37, 99, 235, 0.08);
+
+  border: 1px solid rgba(96, 165, 250, 0.08);
+}
+
+.auth-orb-two {
+  width: 450px;
+  height: 450px;
+
+  bottom: -250px;
+  right: -180px;
+
+  background: rgba(14, 165, 233, 0.06);
+
+  border: 1px solid rgba(56, 189, 248, 0.07);
+}
+
+
+/* =========================================
+   LOGIN / REGISTER CARD
+========================================= */
+
+.auth-card {
+  width: 420px;
+
+  background: #ffffff;
+
+  padding: 40px;
+
+  border-radius: 22px;
+
+  text-align: center;
+
+  position: relative;
+  z-index: 2;
+
+  border: 1px solid rgba(255, 255, 255, 0.8);
+
+  box-shadow:
+    0 25px 60px rgba(0, 0, 0, 0.30),
+    0 8px 25px rgba(15, 23, 42, 0.18);
+}
+
+
+/* =========================================
+   LOGO
+========================================= */
+
+.auth-logo {
+  width: 220px;
+  max-width: 80%;
+
+  height: auto;
+
+  display: block;
+
+  margin: 0 auto 18px;
+}
+
+
+/* =========================================
+   HEADINGS
+========================================= */
+
+.auth-card h2 {
+  margin: 4px 0 8px;
+
+  color: #0f172a;
+
+  font-size: 27px;
+
+  font-weight: 700;
+
+  letter-spacing: -0.4px;
+}
+
+.auth-card p {
+  margin-top: 0;
+
+  color: #64748b;
+
+  font-size: 14px;
+
+  line-height: 1.5;
+}
+
+
+/* =========================================
+   FORM
+========================================= */
+
+.auth-card form {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 15px;
+
+  margin-top: 28px;
+}
+
+
+/* =========================================
+   INPUT FIELDS
+========================================= */
+
+.auth-card input {
+  width: 100%;
+
+  padding: 14px;
+
+  border: 1px solid #dbe2ea;
+
+  border-radius: 11px;
+
+  background: #ffffff;
+
+  color: #0f172a;
+
+  font-size: 15px;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.auth-card input::placeholder {
+  color: #94a3b8;
+}
+
+.auth-card input:hover {
+  border-color: #b8c4d3;
+}
+
+.auth-card input:focus {
+  outline: none;
+
+  border-color: #2563eb;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 0 0 3px rgba(37, 99, 235, 0.10);
+}
+
+
+/* =========================================
+   BUTTON
+========================================= */
+
+.auth-card button {
+  width: 100%;
+
+  padding: 14px;
+
+  border: none;
+
+  border-radius: 11px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #2563eb,
+      #1d4ed8
+    );
+
+  color: #ffffff;
+
+  font-size: 16px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.auth-card button:hover:not(:disabled) {
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 8px 18px rgba(37, 99, 235, 0.25);
+
+  background:
+    linear-gradient(
+      135deg,
+      #1d4ed8,
+      #1e40af
+    );
+}
+
+.auth-card button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.auth-card button:disabled {
+  opacity: 0.7;
+
+  cursor: not-allowed;
+}
+
+
+/* =========================================
+   LOGIN / REGISTER LINK
+========================================= */
+
+.auth-link {
+  margin-top: 22px;
+
+  color: #64748b;
+
+  font-size: 14px;
+
+  line-height: 1.5;
+}
+
+.auth-link span {
+  color: #2563eb;
+
+  cursor: pointer;
+
+  margin-left: 5px;
+
+  font-weight: 600;
+
+  transition: color 0.2s ease;
+}
+
+.auth-link span:hover {
+  color: #1d4ed8;
+
+  text-decoration: underline;
+}
+
+
+/* =========================================
+   RESPONSIVE DESIGN
+========================================= */
+
+@media (max-width: 600px) {
+
+  .auth-container {
+    padding: 20px;
+  }
+
+  .auth-card {
+    width: 100%;
+
+    padding: 34px 24px 30px;
+
+    border-radius: 18px;
+  }
+
+  .auth-logo {
+    width: 195px;
+  }
+
+  .auth-card h2 {
+    font-size: 24px;
+  }
+
+  .auth-orb-one {
+    width: 320px;
+    height: 320px;
+
+    top: -180px;
+    left: -160px;
+  }
+
+  .auth-orb-two {
+    width: 300px;
+    height: 300px;
+
+    bottom: -180px;
+    right: -150px;
+  }
 }
