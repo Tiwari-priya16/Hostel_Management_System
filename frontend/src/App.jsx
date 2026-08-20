@@ -36,6 +36,7 @@ import StudentsDetails from "./pages/admin/StudentsDetails";
 import StaffDetails from "./pages/admin/StaffDetails";
 import AdminMess from "./pages/mess/AdminMess";
 import StudentMess from "./pages/mess/StudentMess";
+import Profile from "./pages/profile/Profile";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -309,6 +310,15 @@ function App() {
           element={
             <ProtectedRoute>
               <StudentMess />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
             </ProtectedRoute>
           }
         />

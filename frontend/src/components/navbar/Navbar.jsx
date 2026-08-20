@@ -43,6 +43,7 @@ function Navbar() {
       "/room-transfer": "Room Transfer Request",
       "/room-transfer/history": "Transfer History",
       "/notices": "Notice Board",
+      "/profile": "My Profile",
     };
     return titles[path] || "HostelSync";
   };
@@ -163,7 +164,7 @@ function Navbar() {
           )}
         </div>
 
-        <div className="user-profile">
+        <div className="user-profile" onClick={() => navigate("/profile")} style={{ cursor: 'pointer' }}>
           <div className="user-details">
             <span className="user-name">{user?.name || "User"}</span>
             <span className="user-role">{user?.role || "Student"}</span>

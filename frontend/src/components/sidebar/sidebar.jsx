@@ -14,6 +14,7 @@ import {
   FaExchangeAlt,
   FaSignOutAlt,
   FaUtensils,
+  FaUser,
 } from "react-icons/fa";
 
 function Sidebar() {
@@ -52,6 +53,16 @@ function Sidebar() {
         >
           <FaTachometerAlt />
           Dashboard
+        </NavLink>
+
+        <NavLink
+          to="/profile"
+          className={({ isActive }) =>
+            isActive ? "active-link" : ""
+          }
+        >
+          <FaUser />
+          My Profile
         </NavLink>
 
         {/* Student Links */}

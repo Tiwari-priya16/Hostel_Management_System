@@ -9,3 +9,8 @@ export const getStaff = async () => {
   const res = await API.get("/auth/staff");
   return res.data;
 };
+
+export const updateUserProfile = async (userData) => {
+  const res = await API.put("/auth/profile", userData);
+  return res.data;
+};
