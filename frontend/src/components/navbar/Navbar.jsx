@@ -51,8 +51,11 @@ function Navbar() {
   const isDashboard = location.pathname.includes("/dashboard");
   const pageTitle = getPageTitle(location.pathname);
 
-  // Initialize notifications based on role
+  // Initialize notifications based on role and localStorage
   const [notifications, setNotifications] = useState(() => {
+    const savedNotis = localStorage.getItem(`notis_${user?._id}`);
+    if (savedNotis) return JSON.parse(savedNotis);
+
     const adminNotis = [
       { id: 1, text: "New complaint raised by Student A", time: "2m ago", read: false },
       { id: 2, text: "New leave request from Student B", time: "1h ago", read: false },
@@ -67,6 +70,13 @@ function Navbar() {
 
     return user?.role === 'admin' ? adminNotis : studentNotis;
   });
+
+  // Sync notifications to localStorage
+  useEffect(() => {
+    if (user?._id) {
+      localStorage.setItem(`notis_${user._id}`, JSON.stringify(notifications));
+    }
+  }, [notifications, user?._id]);
 
   const unreadCount = notifications.filter(n => !n.read).length;
   const filteredNotis = notifications.filter(n => notiTab === "unread" ? !n.read : n.read);
