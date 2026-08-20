@@ -17,6 +17,17 @@ import {
   createNotice,
 } from "../../services/noticeService";
 
+import {
+  FaUsers,
+  FaClipboardList,
+  FaCalendarAlt,
+  FaExchangeAlt,
+  FaCommentDots,
+  FaBullhorn,
+  FaTshirt,
+  FaPlus,
+} from "react-icons/fa";
+
 import "./AdminDashboard.css";
 
 function AdminDashboard() {
@@ -153,55 +164,50 @@ const [
               navigate("/admin/users")
             }
           >
-            <h3>Users</h3>
-
-            <h2>{stats.users}</h2>
-
-        
+            <div className="card-icon users-icon"><FaUsers /></div>
+            <div className="card-info">
+              <h3>Total Users</h3>
+              <h2>{stats.users}</h2>
+            </div>
           </div>
 
           <div
             className="card"
             onClick={() =>
-              navigate(
-                "/admin/complaints"
-              )
+              navigate("/admin/complaints")
             }
           >
-            <h3>
-              Pending Complaints
-            </h3>
-            <h2>
-              {stats.complaints}
-            </h2>
+            <div className="card-icon complaints-icon"><FaClipboardList /></div>
+            <div className="card-info">
+              <h3>Pending Complaints</h3>
+              <h2>{stats.complaints}</h2>
+            </div>
           </div>
 
           <div
             className="card"
             onClick={() =>
-              navigate(
-                "/admin/visitors"
-              )
+              navigate("/admin/visitors")
             }
           >
-            <h3>
-              Pending Visitors
-            </h3>
-            <h2>
-              {stats.visitors}
-            </h2>
+            <div className="card-icon visitors-icon"><FaUsers /></div>
+            <div className="card-info">
+              <h3>Pending Visitors</h3>
+              <h2>{stats.visitors}</h2>
+            </div>
           </div>
 
           <div
             className="card"
             onClick={() =>
-              navigate(
-                "/admin/leaves"
-              )
+              navigate("/admin/leaves")
             }
           >
-            <h3>Pending Leaves</h3>
-            <h2>{stats.leaves}</h2>
+            <div className="card-icon leaves-icon"><FaCalendarAlt /></div>
+            <div className="card-info">
+              <h3>Pending Leaves</h3>
+              <h2>{stats.leaves}</h2>
+            </div>
           </div>
 
           <div
@@ -210,32 +216,37 @@ const [
               navigate("/admin/transfers")
             }
           >
-            <h3>Room Transfers</h3>
-            <h2>{stats.roomTransfers}</h2>
+            <div className="card-icon transfers-icon"><FaExchangeAlt /></div>
+            <div className="card-info">
+              <h3>Room Transfers</h3>
+              <h2>{stats.roomTransfers}</h2>
+            </div>
           </div>
 
           <div
             className="card"
             onClick={() =>
-              navigate(
-                "/admin/feedback"
-              )
+              navigate("/admin/feedback")
             }
           >
-            <h3>Total Feedback</h3>
-            <h2>
-              {stats.feedback}
-            </h2>
+            <div className="card-icon feedback-icon"><FaCommentDots /></div>
+            <div className="card-info">
+              <h3>Total Feedback</h3>
+              <h2>{stats.feedback}</h2>
+            </div>
           </div>
 
           <div
-            className="card"
+            className="card card-notice"
             onClick={() =>
               setShowNoticeForm(true)
             }
           >
-            <h3>Notices</h3>
-            <h2>{stats.notices}</h2>
+            <div className="card-icon notices-icon"><FaPlus /></div>
+            <div className="card-info">
+              <h3>Create Notice</h3>
+              <h2>{stats.notices}</h2>
+            </div>
           </div>
 
           <div
@@ -244,8 +255,11 @@ const [
               navigate("/admin/laundry")
             }
           >
-            <h3>Laundry Bookings</h3>
-            <h2>{stats.laundry}</h2>
+            <div className="card-icon laundry-icon"><FaTshirt /></div>
+            <div className="card-info">
+              <h3>Laundry Bookings</h3>
+              <h2>{stats.laundry}</h2>
+            </div>
           </div>
 
         </div>

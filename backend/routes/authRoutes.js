@@ -6,7 +6,8 @@ const {
   registerUser,
   loginUser,
   getStudents,
-getStaff,
+  getStaff,
+  updateUserProfile,
 } = require("../controllers/authController");
 
 // Middleware
@@ -55,6 +56,12 @@ router.get(
       user: req.user,
     });
   }
+);
+
+router.put(
+  "/profile",
+  protect,
+  updateUserProfile
 );
 
 

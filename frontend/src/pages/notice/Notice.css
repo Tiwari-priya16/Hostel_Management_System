@@ -4,23 +4,23 @@
 
 .notice-container h1 {
   margin-bottom: 25px;
-  color: #1e293b;
+  color: var(--text-primary);
 }
 
 .notice-card {
-  background: white;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
   padding: 25px;
   border-radius: 18px;
   margin-bottom: 20px;
-
-  box-shadow:
-    0 10px 25px rgba(0,0,0,0.06);
-
+  border: 1px solid var(--border-color);
+  box-shadow: var(--nav-shadow);
   transition: 0.3s;
 }
 
 .notice-card:hover {
   transform: translateY(-4px);
+  box-shadow: 0 12px 30px -10px rgba(0,0,0,0.1);
 }
 
 .notice-header {
@@ -32,12 +32,12 @@
 }
 
 .notice-header h3 {
-  color: #1e293b;
+  color: var(--text-primary);
   font-size: 24px;
 }
 
 .notice-date {
-  background: #eff6ff;
+  background: var(--border-subtle);
   color: #2563eb;
 
   padding: 6px 12px;
@@ -48,35 +48,38 @@
 }
 
 .notice-message {
-  color: #475569;
+  color: var(--text-secondary);
   line-height: 1.7;
   font-size: 16px;
 }
 
 .notice-empty {
-  background: white;
+  background: var(--bg-secondary);
   padding: 40px;
   border-radius: 18px;
-
+  border: 1px solid var(--border-color);
   text-align: center;
-  color: gray;
+  color: var(--text-muted);
 }
 
 .notice-form {
-  background: white;
+  background: var(--bg-secondary);
   padding: 20px;
   border-radius: 18px;
   margin-bottom: 25px;
   display: flex;
   flex-direction: column;
   gap: 15px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--nav-shadow);
 }
 
 .notice-form input,
 .notice-form textarea {
   padding: 12px;
-  border: 1px solid #dbe2ea;
+  border: 1px solid var(--border-color);
+  background: var(--bg-primary);
+  color: var(--text-primary);
   border-radius: 10px;
   font-size: 15px;
 }

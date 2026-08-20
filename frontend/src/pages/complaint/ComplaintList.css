@@ -1,22 +1,25 @@
 .complaint-list-container {
-  background: white;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
   padding: 25px;
   border-radius: 15px;
   margin-top: 20px;
-  box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+  box-shadow: var(--nav-shadow);
+  border: 1px solid var(--border-color);
 }
 
 .complaint-table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 20px;
+  color: var(--text-primary);
 }
 
 .complaint-table th,
 .complaint-table td {
   padding: 15px;
   text-align: left;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .status {
@@ -119,11 +122,11 @@
 .complaint-table thead {
   position: sticky;
   top: 0;
-  background: white;
+  background: var(--bg-secondary);
   z-index: 10;
 }
 .complaint-table tbody tr:hover {
-  background: #f8fafc;
+  background: var(--border-subtle);
   transition: 0.3s;
 }
 

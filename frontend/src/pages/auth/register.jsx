@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import { registerUser } from "../../services/authService";
 import logo from "../../assets/hostelsync-logo.png";
 import "./auth.css";
@@ -42,7 +43,7 @@ function Register() {
       !formData.password ||
       !formData.confirmPassword
     ) {
-      alert(
+      toast.warning(
         "Please fill all fields"
       );
       return;
@@ -52,7 +53,7 @@ function Register() {
       formData.password !==
       formData.confirmPassword
     ) {
-      alert(
+      toast.error(
         "Passwords do not match"
       );
       return;
@@ -74,16 +75,20 @@ function Register() {
             formData.password,
         });
 
-      alert(
+      toast.success(
         res.data?.message ||
-          "Registration Successful"
+          "Registration Successful! Redirecting..."
       );
 
-      navigate("/");
+      // 2 second delay to see the toast
+      setTimeout(() => {
+        navigate("/");
+      }, 2000);
+
     } catch (error) {
       console.log(error);
 
-      alert(
+      toast.error(
         error.response?.data
           ?.message ||
           "Registration Failed"

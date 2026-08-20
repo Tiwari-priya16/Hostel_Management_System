@@ -11,6 +11,7 @@ const feedbackRoutes = require("./routes/feedbackRoutes");
 const noticeRoutes = require("./routes/noticeRoutes");
 const leaveRoutes = require("./routes/leaveRoutes");
 const roomTransferRoutes = require("./routes/roomTransferRoutes");
+const messRoutes = require("./routes/messRoutes");
 
 dotenv.config();
 connectDB();
@@ -27,6 +28,7 @@ app.use("/api/feedback", feedbackRoutes);
 app.use("/api/notices", noticeRoutes);
 app.use("/api/leave", leaveRoutes);
 app.use("/api/room-transfer", roomTransferRoutes);
+app.use("/api/mess", messRoutes);
 
 app.get("/", (req, res) => {
   res.send("Hostel Management API Running...");

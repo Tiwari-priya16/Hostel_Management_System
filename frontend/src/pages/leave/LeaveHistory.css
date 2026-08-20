@@ -1,9 +1,11 @@
 .leave-history-container {
-  background: white;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
   padding: 25px;
   border-radius: 15px;
   margin-top: 20px;
-  box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+  box-shadow: var(--nav-shadow);
+  border: 1px solid var(--border-color);
 }
 
 .leave-table {
@@ -15,8 +17,13 @@
 .leave-table th,
 .leave-table td {
   padding: 15px;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid var(--border-color);
   text-align: left;
+  color: var(--text-primary);
+}
+
+.leave-table tbody tr:hover {
+  background: var(--border-subtle);
 }
 
 .status {

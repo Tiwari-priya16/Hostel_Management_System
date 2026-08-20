@@ -11,6 +11,15 @@ import { getMyVisitors } from "../../services/visitorService";
 import { getMyFeedback } from "../../services/feedbackService";
 import { getMyTransfers } from "../../services/roomTransferService";
 
+import {
+  FaClipboardList,
+  FaCalendarAlt,
+  FaTshirt,
+  FaUsers,
+  FaCommentDots,
+  FaExchangeAlt,
+} from "react-icons/fa";
+
 import "./dashboard.css";
 
 function StuDashboard() {
@@ -116,8 +125,11 @@ function StuDashboard() {
               navigate("/my-complaints")
             }
           >
-            <h3>📝 Complaints</h3>
-            <p>{stats.complaints}</p>
+            <div className="card-icon complaints-icon"><FaClipboardList /></div>
+            <div className="card-info">
+              <h3>Complaints</h3>
+              <p>{stats.complaints}</p>
+            </div>
           </div>
 
           <div
@@ -126,8 +138,11 @@ function StuDashboard() {
               navigate("/my-leaves")
             }
           >
-            <h3>📅 Leave Requests</h3>
-            <p>{stats.leaves}</p>
+            <div className="card-icon leaves-icon"><FaCalendarAlt /></div>
+            <div className="card-info">
+              <h3>Leave Requests</h3>
+              <p>{stats.leaves}</p>
+            </div>
           </div>
 
           <div
@@ -136,8 +151,11 @@ function StuDashboard() {
               navigate("/laundry/history")
             }
           >
-            <h3>🧺 Laundry</h3>
-            <p>{stats.laundry}</p>
+            <div className="card-icon laundry-icon"><FaTshirt /></div>
+            <div className="card-info">
+              <h3>Laundry</h3>
+              <p>{stats.laundry}</p>
+            </div>
           </div>
 
           <div
@@ -146,8 +164,11 @@ function StuDashboard() {
               navigate("/visitors/history")
             }
           >
-            <h3>👥 Visitors</h3>
-            <p>{stats.visitors}</p>
+            <div className="card-icon visitors-icon"><FaUsers /></div>
+            <div className="card-info">
+              <h3>Visitors</h3>
+              <p>{stats.visitors}</p>
+            </div>
           </div>
 
           <div
@@ -156,8 +177,11 @@ function StuDashboard() {
               navigate("/feedback/history")
             }
           >
-            <h3>💬 Feedback</h3>
-            <p>{stats.feedback}</p>
+            <div className="card-icon feedback-icon"><FaCommentDots /></div>
+            <div className="card-info">
+              <h3>Feedback</h3>
+              <p>{stats.feedback}</p>
+            </div>
           </div>
 
           <div
@@ -166,8 +190,11 @@ function StuDashboard() {
               navigate("/room-transfer/history")
             }
           >
-            <h3>🔄 Room Transfer</h3>
-            <p>{stats.roomTransfer}</p>
+            <div className="card-icon transfers-icon"><FaExchangeAlt /></div>
+            <div className="card-info">
+              <h3>Room Transfer</h3>
+              <p>{stats.roomTransfer}</p>
+            </div>
           </div>
 
         </div>

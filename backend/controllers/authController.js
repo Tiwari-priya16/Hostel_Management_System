@@ -139,9 +139,40 @@ const loginUser = async (req, res) => {
   }
 };
 
+const updateUserProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+
+    if (user) {
+      user.name = req.body.name || user.name;
+      user.phone = req.body.phone || user.phone;
+      user.roomNumber = req.body.roomNumber || user.roomNumber;
+      user.hostelBlock = req.body.hostelBlock || user.hostelBlock;
+
+      if (req.body.password) {
+        const salt = await bcrypt.genSalt(10);
+        user.password = await bcrypt.hash(req.body.password, salt);
+      }
+
+      const updatedUser = await user.save();
+      updatedUser.password = undefined;
+
+      res.json({
+        success: true,
+        user: updatedUser,
+      });
+    } else {
+      res.status(404).json({ success: false, message: "User not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
   getStudents,
   getStaff,
+  updateUserProfile,
 };
