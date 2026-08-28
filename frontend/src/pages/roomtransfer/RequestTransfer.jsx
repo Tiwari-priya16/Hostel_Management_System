@@ -16,6 +16,8 @@ function RequestTransfer() {
     reason: "",
   });
 
+  const [loading, setLoading] = useState(false);
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -27,9 +29,10 @@ function RequestTransfer() {
     e.preventDefault();
 
     try {
+      setLoading(true);
       await applyTransfer(formData);
 
-      alert("Room transfer request submitted");
+      toast.success("Room transfer request submitted");
 
       setFormData({
         currentRoom: "",
@@ -39,10 +42,9 @@ function RequestTransfer() {
 
       navigate("/room-transfer/history");
     } catch (error) {
-      alert(
-        error.response?.data?.message ||
-        "Failed to submit request"
-      );
+      toast.error(error.response?.data?.message || "Failed to submit request");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -87,8 +89,8 @@ function RequestTransfer() {
               required
             />
 
-            <button type="submit">
-              Submit Request
+            <button type="submit" disabled={loading}>
+              {loading ? "Submitting..." : "Submit Request"}
             </button>
 
             <button

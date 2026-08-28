@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Sidebar from "../../components/sidebar/Sidebar";
 import Navbar from "../../components/navbar/Navbar";
+import { toast } from "react-toastify";
 
 import {
   getAllLeaves,
@@ -29,19 +30,23 @@ function AdminLeaves() {
 
   const handleApprove = async (id) => {
     try {
+      setLeaves(prev => prev.map(item => item._id === id ? { ...item, status: "Approved" } : item));
       await approveLeave(id);
-      fetchLeaves();
+      toast.success("Leave approved");
     } catch (err) {
-      console.log(err);
+      toast.error("Failed to approve leave");
+      fetchLeaves();
     }
   };
 
   const handleReject = async (id) => {
     try {
+      setLeaves(prev => prev.map(item => item._id === id ? { ...item, status: "Rejected" } : item));
       await rejectLeave(id);
-      fetchLeaves();
+      toast.success("Leave rejected");
     } catch (err) {
-      console.log(err);
+      toast.error("Failed to reject leave");
+      fetchLeaves();
     }
   };
 

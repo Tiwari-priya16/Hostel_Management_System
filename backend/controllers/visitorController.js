@@ -1,4 +1,5 @@
 const Visitor = require("../models/Visitor");
+const { createNotification, notifyAdmins } = require("../utils/notificationHelper");
 
 // Create Visitor Request
 const createVisitor = async (req, res) => {
@@ -17,6 +18,9 @@ const createVisitor = async (req, res) => {
       visitDate,
       student: req.user._id,
     });
+
+    // Notify Admins (Async)
+    notifyAdmins(req.user._id, `New Visitor Request: ${visitorName} for Student ${req.user.name}`, "visitor");
 
     res.status(201).json({
       success: true,
@@ -85,6 +89,9 @@ const approveVisitor = async (req, res) => {
 
     await visitor.save();
 
+    // Notify Student (Async)
+    createNotification(visitor.student, req.user._id, `Your visitor request for ${visitor.visitorName} has been Approved`, "visitor");
+
     res.status(200).json({
       success: true,
       message: "Visitor approved successfully",
@@ -113,6 +120,9 @@ const rejectVisitor = async (req, res) => {
     visitor.approvedBy = req.user._id;
 
     await visitor.save();
+
+    // Notify Student (Async)
+    createNotification(visitor.student, req.user._id, `Your visitor request for ${visitor.visitorName} has been Rejected`, "visitor");
 
     res.status(200).json({
       success: true,

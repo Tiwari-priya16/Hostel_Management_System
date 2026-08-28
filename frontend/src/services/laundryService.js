@@ -1,47 +1,65 @@
 import API from "./api";
 
-
-
-export const createLaundry = async (data) => {
-  const res = await API.post("/laundry", data);
+// Machines
+export const getMachines = async () => {
+  const res = await API.get("/laundry/machines");
   return res.data;
 };
 
-export const getMyLaundry = async () => {
-  const res = await API.get("/laundry/my");
+export const addMachine = async (data) => {
+  const res = await API.post("/laundry/machines", data);
   return res.data;
 };
 
-export const cancelLaundry = async (id) => {
-  const res = await API.put(`/laundry/${id}/cancel`);
+export const updateMachine = async (id, data) => {
+  const res = await API.put(`/laundry/machines/${id}`, data);
   return res.data;
 };
 
-export const getAllLaundry = async () => {
-  const res = await API.get("/laundry");
+// Bookings
+export const createLaundryBooking = async (data) => {
+  const res = await API.post("/laundry/bookings", data);
   return res.data;
 };
 
-export const getLaundryAnalytics = async () => {
-  const res = await API.get("/laundry/analytics");
+export const getMyLaundryBookings = async () => {
+  const res = await API.get("/laundry/bookings/my");
   return res.data;
 };
 
-export const completeLaundry = async (
-  id
-) => {
-  const res = await API.put(
-    `/laundry/${id}/complete`
-  );
-
+export const getAllLaundryBookings = async () => {
+  const res = await API.get("/laundry/bookings");
   return res.data;
 };
 
-export const deleteLaundry =
-  async (id) => {
-    const res = await API.delete(
-      `/laundry/${id}`
-    );
+export const cancelLaundryBooking = async (id) => {
+  const res = await API.patch(`/laundry/bookings/${id}/cancel`);
+  return res.data;
+};
 
-    return res.data;
-  };
+// Maintenance
+export const reportMachineProblem = async (data) => {
+  const res = await API.post("/laundry/maintenance", data);
+  return res.data;
+};
+
+export const getMaintenanceRequests = async () => {
+  const res = await API.get("/laundry/maintenance");
+  return res.data;
+};
+
+export const resolveMaintenanceRequest = async (id) => {
+  const res = await API.patch(`/laundry/maintenance/${id}/resolve`);
+  return res.data;
+};
+
+// Settings
+export const getLaundrySettings = async () => {
+  const res = await API.get("/laundry/settings");
+  return res.data;
+};
+
+export const updateLaundrySettings = async (data) => {
+  const res = await API.put("/laundry/settings", data);
+  return res.data;
+};

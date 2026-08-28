@@ -17,6 +17,8 @@ function AddVisitor() {
     visitDate: "",
   });
 
+  const [loading, setLoading] = useState(false);
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -28,9 +30,10 @@ function AddVisitor() {
     e.preventDefault();
 
     try {
+      setLoading(true);
       await createVisitor(formData);
 
-      alert("Visitor request submitted");
+      toast.success("Visitor request submitted");
 
       setFormData({
         visitorName: "",
@@ -41,10 +44,9 @@ function AddVisitor() {
 
       navigate("/visitors/history");
     } catch (error) {
-      alert(
-        error.response?.data?.message ||
-          "Failed to add visitor"
-      );
+      toast.error(error.response?.data?.message || "Failed to add visitor");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -99,8 +101,8 @@ return (
               required
             />
 
-            <button type="submit">
-              Add Visitor
+            <button type="submit" disabled={loading}>
+              {loading ? "Adding..." : "Add Visitor"}
             </button>
 
             <button

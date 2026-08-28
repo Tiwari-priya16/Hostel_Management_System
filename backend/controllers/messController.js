@@ -75,7 +75,7 @@ const updateMenu = async (req, res) => {
     const menu = await MessMenu.findOneAndUpdate(
       { day },
       { breakfast, lunch, dinner },
-      { new: true, upsert: true }
+      { returnDocument: 'after', upsert: true }
     );
     res.json({ success: true, menu });
   } catch (error) {
@@ -85,7 +85,7 @@ const updateMenu = async (req, res) => {
 
 const submitRating = async (req, res) => {
   try {
-    const { mealType, rating, date } = req.body;
+    const { mealType, foodQuality, cleanliness, taste, comment, date } = req.body;
     const student = req.user._id;
 
     const existingRating = await MessRating.findOne({ student, mealType, date });
@@ -93,7 +93,15 @@ const submitRating = async (req, res) => {
       return res.status(400).json({ success: false, message: "You have already rated this meal today" });
     }
 
-    const newRating = await MessRating.create({ student, mealType, rating, date });
+    const newRating = await MessRating.create({
+      student,
+      mealType,
+      foodQuality,
+      cleanliness,
+      taste,
+      comment,
+      date
+    });
     res.status(201).json({ success: true, rating: newRating });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -103,18 +111,31 @@ const submitRating = async (req, res) => {
 const getTodayRatings = async (req, res) => {
   try {
     const { date } = req.query;
-    const ratings = await MessRating.find({ date });
+    const ratings = await MessRating.find({ date }).populate("student", "name roomNumber");
 
     // Calculate averages
     const analytics = {
-      breakfast: { avg: 0, count: 0 },
-      lunch: { avg: 0, count: 0 },
-      dinner: { avg: 0, count: 0 }
+      breakfast: { avg: 0, count: 0, feedback: [] },
+      lunch: { avg: 0, count: 0, feedback: [] },
+      dinner: { avg: 0, count: 0, feedback: [] }
     };
 
     ratings.forEach(r => {
-      analytics[r.mealType].avg += r.rating;
+      const mealAvg = ((r.foodQuality + r.cleanliness + r.taste) / 3);
+      analytics[r.mealType].avg += mealAvg;
       analytics[r.mealType].count += 1;
+
+      analytics[r.mealType].feedback.push({
+        user: r.student?.name || "Unknown",
+        room: r.student?.roomNumber || "N/A",
+        ratings: {
+          food: r.foodQuality,
+          clean: r.cleanliness,
+          taste: r.taste
+        },
+        avg: mealAvg.toFixed(1),
+        comment: r.comment || "No comment"
+      });
     });
 
     Object.keys(analytics).forEach(type => {

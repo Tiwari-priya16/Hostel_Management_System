@@ -1,6 +1,85 @@
 const User = require("../models/User");
+const OTP = require("../models/OTP");
 const bcrypt = require("bcryptjs");
 const generateToken = require("../utils/generateToken");
+const sendEmail = require("../utils/emailHelper");
+
+// Forgot Password - Send OTP
+const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found with this email" });
+    }
+
+    // Generate 6 digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // Save OTP to DB
+    await OTP.findOneAndUpdate(
+      { email },
+      { otp, createdAt: new Date() },
+      { upsert: true, returnDocument: 'after' }
+    );
+
+    // Send Real Email
+    const message = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
+        <h2 style="color: #2563eb; text-align: center;">HostelSync Password Reset</h2>
+        <p>Hello,</p>
+        <p>You requested a password reset. Please use the following One-Time Password (OTP) to reset your account password. This OTP is valid for 5 minutes.</p>
+        <div style="background: #f1f5f9; padding: 15px; text-align: center; font-size: 24px; font-weight: bold; letter-spacing: 5px; color: #0f172a; margin: 20px 0; border-radius: 5px;">
+          ${otp}
+        </div>
+        <p>If you did not request this, please ignore this email.</p>
+        <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
+        <p style="font-size: 12px; color: #666; text-align: center;">© 2026 HostelSync Management System</p>
+      </div>
+    `;
+
+    await sendEmail({
+      email: user.email,
+      subject: "Your HostelSync Password Reset OTP",
+      html: message,
+    });
+
+    res.json({ success: true, message: "OTP sent to your email successfully" });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// Reset Password - Verify OTP and update
+const resetPassword = async (req, res) => {
+  try {
+    const { email, otp, newPassword } = req.body;
+
+    const otpRecord = await OTP.findOne({ email, otp });
+
+    if (!otpRecord) {
+      return res.status(400).json({ success: false, message: "Invalid or expired OTP" });
+    }
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    // Hash new password
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(newPassword, salt);
+    await user.save();
+
+    // Delete OTP record
+    await OTP.deleteOne({ _id: otpRecord._id });
+
+    res.json({ success: true, message: "Password reset successful. Please login." });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
 
 // Register User
 const registerUser = async (req, res) => {
@@ -175,4 +254,6 @@ module.exports = {
   getStudents,
   getStaff,
   updateUserProfile,
+  forgotPassword,
+  resetPassword,
 };

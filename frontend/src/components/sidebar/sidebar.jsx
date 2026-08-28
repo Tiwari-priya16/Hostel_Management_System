@@ -15,6 +15,7 @@ import {
   FaSignOutAlt,
   FaUtensils,
   FaUser,
+  FaWalking,
 } from "react-icons/fa";
 
 function Sidebar() {
@@ -75,7 +76,7 @@ function Sidebar() {
               }
             >
               <FaUtensils />
-              Mess Menu
+              Mess & Feedback
             </NavLink>
 
             <NavLink
@@ -119,16 +120,6 @@ function Sidebar() {
             </NavLink>
 
             <NavLink
-              to="/feedback"
-              className={({ isActive }) =>
-                isActive ? "active-link" : ""
-              }
-            >
-              <FaCommentDots />
-              Feedback
-            </NavLink>
-
-            <NavLink
               to="/notices"
               className={({ isActive }) =>
                 isActive ? "active-link" : ""
@@ -146,6 +137,16 @@ function Sidebar() {
             >
               <FaExchangeAlt />
               Room Transfer
+            </NavLink>
+
+            <NavLink
+              to="/gate"
+              className={({ isActive }) =>
+                isActive ? "active-link" : ""
+              }
+            >
+              <FaWalking />
+              Entry / Exit
             </NavLink>
           </>
         )}
@@ -170,7 +171,7 @@ function Sidebar() {
               }
             >
               <FaUtensils />
-              Mess Management
+              Mess & Analytics
             </NavLink>
 
             <NavLink
@@ -214,16 +215,6 @@ function Sidebar() {
             </NavLink>
 
             <NavLink
-              to="/admin/feedback"
-              className={({ isActive }) =>
-                isActive ? "active-link" : ""
-              }
-            >
-              <FaCommentDots />
-              Feedback
-            </NavLink>
-
-            <NavLink
               to="/admin/notices"
               className={({ isActive }) =>
                 isActive ? "active-link" : ""
@@ -241,6 +232,16 @@ function Sidebar() {
             >
               <FaExchangeAlt />
               Room Transfer
+            </NavLink>
+
+            <NavLink
+              to="/admin/gate"
+              className={({ isActive }) =>
+                isActive ? "active-link" : ""
+              }
+            >
+              <FaWalking />
+              Gate Tracking
             </NavLink>
           </>
         )}

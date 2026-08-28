@@ -2,6 +2,8 @@ import React, { useContext, useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ThemeContext } from "../../context/ThemeContext";
 import { FaSun, FaMoon, FaBell, FaUserCircle, FaArrowLeft } from "react-icons/fa";
+import { getNotifications, markAsRead, markAllAsRead } from "../../services/notificationService";
+import { toast } from "react-toastify";
 import "./Navbar.css";
 import logo from "../../assets/hostelsync-logo.png";
 
@@ -12,7 +14,47 @@ function Navbar() {
   const user = JSON.parse(localStorage.getItem("user"));
   const [showNoti, setShowNoti] = useState(false);
   const [notiTab, setNotiTab] = useState("unread"); // unread, archived
+  const [notifications, setNotifications] = useState([]);
   const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    if (user) {
+      fetchNotifications();
+      // Polling every 30 seconds for new notifications
+      const interval = setInterval(fetchNotifications, 30000);
+      return () => clearInterval(interval);
+    }
+  }, []);
+
+  const fetchNotifications = async () => {
+    try {
+      const res = await getNotifications();
+      if (res.success) {
+        setNotifications(res.notifications);
+      }
+    } catch (error) {
+      console.error("Fetch Notifications Error:", error);
+    }
+  };
+
+  const handleMarkRead = async (id) => {
+    try {
+      await markAsRead(id);
+      fetchNotifications();
+    } catch (error) {
+      toast.error("Failed to mark as read");
+    }
+  };
+
+  const handleMarkAllRead = async () => {
+    try {
+      await markAllAsRead();
+      fetchNotifications();
+      toast.success("All notifications archived");
+    } catch (error) {
+      toast.error("Failed to mark all as read");
+    }
+  };
 
   // Helper to get page title based on path
   const getPageTitle = (path) => {
@@ -51,43 +93,8 @@ function Navbar() {
   const isDashboard = location.pathname.includes("/dashboard");
   const pageTitle = getPageTitle(location.pathname);
 
-  // Initialize notifications based on role and localStorage
-  const [notifications, setNotifications] = useState(() => {
-    const savedNotis = localStorage.getItem(`notis_${user?._id}`);
-    if (savedNotis) return JSON.parse(savedNotis);
-
-    const adminNotis = [
-      { id: 1, text: "New complaint raised by Student A", time: "2m ago", read: false },
-      { id: 2, text: "New leave request from Student B", time: "1h ago", read: false },
-      { id: 3, text: "Notice posted: Independence Day Special Lunch", time: "5h ago", read: true },
-    ];
-
-    const studentNotis = [
-      { id: 101, text: "Your leave request for 15th Aug has been approved", time: "10m ago", read: false },
-      { id: 102, text: "New notice: Hostel fees due by next week", time: "2h ago", read: false },
-      { id: 103, text: "Complaint #452 has been resolved", time: "1d ago", read: true },
-    ];
-
-    return user?.role === 'admin' ? adminNotis : studentNotis;
-  });
-
-  // Sync notifications to localStorage
-  useEffect(() => {
-    if (user?._id) {
-      localStorage.setItem(`notis_${user._id}`, JSON.stringify(notifications));
-    }
-  }, [notifications, user?._id]);
-
-  const unreadCount = notifications.filter(n => !n.read).length;
-  const filteredNotis = notifications.filter(n => notiTab === "unread" ? !n.read : n.read);
-
-  const markAllRead = () => {
-    setNotifications(notifications.map(n => ({ ...n, read: true })));
-  };
-
-  const markRead = (id) => {
-    setNotifications(notifications.map(n => n.id === id ? { ...n, read: true } : n));
-  };
+  const unreadCount = notifications.filter(n => !n.isRead).length;
+  const filteredNotis = notifications.filter(n => notiTab === "unread" ? !n.isRead : n.isRead);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -145,7 +152,7 @@ function Navbar() {
                   </span>
                 </div>
                 {notiTab === 'unread' && unreadCount > 0 && (
-                  <button className="mark-all-btn" onClick={markAllRead}>Mark all read</button>
+                  <button className="mark-all-btn" onClick={handleMarkAllRead}>Mark all read</button>
                 )}
               </div>
 
@@ -153,15 +160,15 @@ function Navbar() {
                 {filteredNotis.length > 0 ? (
                   filteredNotis.map(n => (
                     <div
-                      key={n.id}
-                      className={`noti-item ${!n.read ? 'unread' : 'read'}`}
-                      onClick={() => markRead(n.id)}
+                      key={n._id}
+                      className={`noti-item ${!n.isRead ? 'unread' : 'read'}`}
+                      onClick={() => handleMarkRead(n._id)}
                     >
                       <div className="noti-content">
-                        <p>{n.text}</p>
-                        <span>{n.time}</span>
+                        <p>{n.message}</p>
+                        <span>{new Date(n.createdAt).toLocaleString()}</span>
                       </div>
-                      {!n.read && <div className="unread-dot"></div>}
+                      {!n.isRead && <div className="unread-dot"></div>}
                     </div>
                   ))
                 ) : (

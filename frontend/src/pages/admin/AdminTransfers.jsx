@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Sidebar from "../../components/sidebar/Sidebar";
 import Navbar from "../../components/navbar/Navbar";
+import { toast } from "react-toastify";
 
 import {
   getAllTransfers,
@@ -30,23 +31,23 @@ function AdminTransfers() {
 
   const handleApprove = async (id) => {
     try {
+      setTransfers(prev => prev.map(item => item._id === id ? { ...item, status: "Approved" } : item));
       await approveTransfer(id);
-
-      alert("Transfer approved");
-      fetchTransfers();
+      toast.success("Transfer approved");
     } catch (error) {
-      console.log(error);
+      toast.error("Failed to approve");
+      fetchTransfers();
     }
   };
 
   const handleReject = async (id) => {
     try {
+      setTransfers(prev => prev.map(item => item._id === id ? { ...item, status: "Rejected" } : item));
       await rejectTransfer(id);
-
-      alert("Transfer rejected");
-      fetchTransfers();
+      toast.success("Transfer rejected");
     } catch (error) {
-      console.log(error);
+      toast.error("Failed to reject");
+      fetchTransfers();
     }
   };
 

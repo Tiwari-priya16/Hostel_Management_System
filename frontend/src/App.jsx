@@ -5,6 +5,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 import Login from "./pages/auth/login";
 import Register from "./pages/auth/register";
+import ForgotPassword from "./pages/auth/ForgotPassword";
 
 import AdminDashboard from "./pages/dashboard/AdminDashboard";
 import StuDashboard from "./pages/dashboard/StuDashboard";
@@ -17,8 +18,6 @@ import Laundry from "./pages/laundry/Laundry";
 import BookingHistory from "./pages/laundry/BookingHistory";
 import AddVisitor from "./pages/visitor/AddVisitor";
 import VisitorHistory from "./pages/visitor/VisitorHistory";
-import GiveFeedback from "./pages/feedback/GiveFeedback";
-import FeedbackList from "./pages/feedback/FeedbackList";
 import RequestTransfer from "./pages/roomTransfer/RequestTransfer";
 import TransferHistory from "./pages/roomTransfer/TransferHistory";
 import NoticeList from "./pages/notice/NoticeList";
@@ -27,7 +26,6 @@ import NoticeList from "./pages/notice/NoticeList";
 import AdminComplaints from "./pages/admin/AdminComplaints";
 import AdminLeaves from "./pages/admin/AdminLeaves";
 import AdminVisitors from "./pages/admin/AdminVisitors";
-import AdminFeedback from "./pages/admin/AdminFeedback";
 import AdminNotice from "./pages/admin/AdminNotice";
 import AdminLaundry from "./pages/admin/AdminLaundry";
 import AdminTransfers from "./pages/admin/AdminTransfers";
@@ -37,6 +35,8 @@ import StaffDetails from "./pages/admin/StaffDetails";
 import AdminMess from "./pages/mess/AdminMess";
 import StudentMess from "./pages/mess/StudentMess";
 import Profile from "./pages/profile/Profile";
+import EntryExit from "./pages/gate/EntryExit";
+import AdminGateControl from "./pages/admin/AdminGateControl";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -59,6 +59,7 @@ function App() {
         {/* Authentication Routes */}
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
 
         {/* Dashboard Routes */}
 
@@ -162,24 +163,6 @@ function App() {
         />
 
         <Route
-          path="/feedback"
-          element={
-            <ProtectedRoute>
-              <GiveFeedback />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/feedback/history"
-          element={
-            <ProtectedRoute>
-              <FeedbackList />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
           path="/room-transfer"
           element={
             <ProtectedRoute>
@@ -229,15 +212,6 @@ function App() {
           element={
             <ProtectedRoute>
               <AdminVisitors />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/admin/feedback"
-          element={
-            <ProtectedRoute>
-              <AdminFeedback />
             </ProtectedRoute>
           }
         />
@@ -319,6 +293,24 @@ function App() {
           element={
             <ProtectedRoute>
               <Profile />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/gate"
+          element={
+            <ProtectedRoute>
+              <EntryExit />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/gate"
+          element={
+            <ProtectedRoute>
+              <AdminGateControl />
             </ProtectedRoute>
           }
         />

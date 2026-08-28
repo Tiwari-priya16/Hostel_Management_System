@@ -3,7 +3,7 @@ import Sidebar from "../../components/sidebar/Sidebar";
 import Navbar from "../../components/navbar/Navbar";
 import { updateUserProfile } from "../../services/userService";
 import { toast } from "react-toastify";
-import { FaUser, FaPhone, FaEnvelope, FaBuilding, FaDoorOpen, FaLock, FaCamera } from "react-icons/fa";
+import { FaUser, FaPhone, FaEnvelope, FaBuilding, FaDoorOpen, FaCamera } from "react-icons/fa";
 import "./Profile.css";
 
 function Profile() {
@@ -13,8 +13,6 @@ function Profile() {
     phone: user?.phone || "",
     roomNumber: user?.roomNumber || "",
     hostelBlock: user?.hostelBlock || "",
-    password: "",
-    confirmPassword: "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -25,9 +23,6 @@ function Profile() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (formData.password && formData.password !== formData.confirmPassword) {
-      return toast.error("Passwords do not match");
-    }
 
     try {
       setLoading(true);
@@ -97,19 +92,6 @@ function Profile() {
                     </div>
                   </div>
                 )}
-
-                <div className="form-divider">Change Password</div>
-
-                <div className="form-row">
-                  <div className="form-group">
-                    <label><FaLock /> New Password</label>
-                    <input type="password" name="password" placeholder="Leave blank to keep same" value={formData.password} onChange={handleChange} />
-                  </div>
-                  <div className="form-group">
-                    <label><FaLock /> Confirm Password</label>
-                    <input type="password" name="confirmPassword" placeholder="Confirm new password" value={formData.confirmPassword} onChange={handleChange} />
-                  </div>
-                </div>
 
                 <button type="submit" className="update-profile-btn" disabled={loading}>
                   {loading ? "Updating..." : "Update Profile"}

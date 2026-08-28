@@ -1,73 +1,39 @@
 const express = require("express");
 const router = express.Router();
-
+const { protect, authorizeRoles } = require("../middleware/authMiddleware");
 const {
-  createLaundrySlot,
+  getMachines,
+  addMachine,
+  updateMachine,
+  createBooking,
   getMyBookings,
   getAllBookings,
   cancelBooking,
-  completeBooking,
-  getLaundryAnalytics,
-  deleteBooking,
+  reportProblem,
+  getMaintenanceRequests,
+  resolveMaintenance,
+  getSettings,
+  updateSettings
 } = require("../controllers/laundryController");
 
-const {
-  protect,
-  authorizeRoles,
-} = require("../middleware/authMiddleware");
+// Machines
+router.get("/machines", protect, getMachines);
+router.post("/machines", protect, authorizeRoles("admin"), addMachine);
+router.put("/machines/:id", protect, authorizeRoles("admin"), updateMachine);
 
-const {
-  validateLaundryBooking,
-} = require("../validators/laundryValidator");
+// Bookings
+router.get("/bookings", protect, authorizeRoles("admin"), getAllBookings);
+router.get("/bookings/my", protect, getMyBookings);
+router.post("/bookings", protect, createBooking);
+router.patch("/bookings/:id/cancel", protect, cancelBooking);
 
-router.post(
-  "/",
-  protect,
-  authorizeRoles("student"),
-  validateLaundryBooking,
-  createLaundrySlot
-);
+// Maintenance
+router.get("/maintenance", protect, authorizeRoles("admin"), getMaintenanceRequests);
+router.post("/maintenance", protect, reportProblem);
+router.patch("/maintenance/:id/resolve", protect, authorizeRoles("admin"), resolveMaintenance);
 
-router.get(
-  "/my",
-  protect,
-  authorizeRoles("student"),
-  getMyBookings
-);
-
-router.get(
-  "/analytics",
-  protect,
-  authorizeRoles("admin"),
-  getLaundryAnalytics
-);
-
-router.get(
-  "/",
-  protect,
-  authorizeRoles("admin"),
-  getAllBookings
-);
-
-router.put(
-  "/:id/cancel",
-  protect,
-  authorizeRoles("student"),
-  cancelBooking
-);
-
-router.put(
-  "/:id/complete",
-  protect,
-  authorizeRoles("admin", "staff"),
-  completeBooking
-);
-
-router.delete(
-  "/:id",
-  protect,
-  authorizeRoles("admin", "staff"),
-  deleteBooking
-);
+// Settings
+router.get("/settings", protect, getSettings);
+router.put("/settings", protect, authorizeRoles("admin"), updateSettings);
 
 module.exports = router;

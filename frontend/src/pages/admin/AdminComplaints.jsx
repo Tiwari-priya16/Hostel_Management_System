@@ -7,6 +7,7 @@ import {
   updateComplaintStatus,
   deleteComplaint,
 } from "../../services/complaintService";
+import { toast } from "react-toastify";
 
 import "../complaint/ComplaintList.css";
 import "../dashboard/dashboard.css";
@@ -29,25 +30,28 @@ function AdminComplaints() {
 
   const handleStatusChange = async (id, status) => {
     try {
+      // Optimistic UI update
+      setComplaints(prev => prev.map(item =>
+        item._id === id ? { ...item, status } : item
+      ));
+
       await updateComplaintStatus(id, status);
-      fetchComplaints();
+      toast.success(`Status updated to ${status}`);
     } catch (err) {
-      console.log(err);
+      toast.error("Failed to update status");
+      fetchComplaints();
     }
   };
 
   const handleDelete = async (id) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this complaint?"
-    );
-
-    if (!confirmDelete) return;
+    if (!window.confirm("Are you sure you want to delete this complaint?")) return;
 
     try {
       await deleteComplaint(id);
+      toast.success("Complaint deleted");
       fetchComplaints();
     } catch (err) {
-      console.log(err);
+      toast.error("Failed to delete");
     }
   };
 

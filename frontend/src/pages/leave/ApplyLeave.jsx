@@ -13,6 +13,8 @@ function ApplyLeave() {
     toDate: "",
   });
 
+  const [loading, setLoading] = useState(false);
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -24,9 +26,10 @@ function ApplyLeave() {
     e.preventDefault();
 
     try {
+      setLoading(true);
       await applyLeave(formData);
 
-      alert("Leave applied successfully!");
+      toast.success("Leave applied successfully!");
 
       setFormData({
         reason: "",
@@ -35,11 +38,10 @@ function ApplyLeave() {
       });
 
     } catch (error) {
-        console.log(error.response?.data);
-        alert(
-            JSON.stringify(error.response?.data)
-        );
-        }
+        toast.error(error.response?.data?.message || "Failed to apply leave");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -83,8 +85,8 @@ function ApplyLeave() {
                 required
               />
 
-              <button type="submit">
-                Apply Leave
+              <button type="submit" disabled={loading}>
+                {loading ? "Applying..." : "Apply Leave"}
               </button>
 
             </form>

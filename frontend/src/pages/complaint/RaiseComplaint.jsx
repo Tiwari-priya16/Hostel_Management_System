@@ -5,6 +5,7 @@ import Sidebar from "../../components/sidebar/Sidebar";
 import Navbar from "../../components/navbar/Navbar";
 
 import { createComplaint } from "../../services/complaintService";
+import { toast } from "react-toastify";
 
 import "../dashboard/dashboard.css";
 import "./RaiseComplaint.css";
@@ -18,6 +19,8 @@ function RaiseComplaint() {
     category: "General",
   });
 
+  const [loading, setLoading] = useState(false);
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -29,11 +32,10 @@ function RaiseComplaint() {
     e.preventDefault();
 
     try {
+      setLoading(true);
       await createComplaint(formData);
 
-      alert(
-        "Complaint submitted successfully!"
-      );
+      toast.success("Complaint submitted successfully!");
 
       setFormData({
         title: "",
@@ -43,12 +45,9 @@ function RaiseComplaint() {
 
       navigate("/my-complaints");
     } catch (error) {
-      console.log(error);
-
-      alert(
-        error.response?.data?.message ||
-          "Failed to raise complaint"
-      );
+      toast.error(error.response?.data?.message || "Failed to raise complaint");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -96,8 +95,8 @@ function RaiseComplaint() {
                 required
               />
 
-              <button type="submit">
-                Submit Complaint
+              <button type="submit" disabled={loading}>
+                {loading ? "Submitting..." : "Submit Complaint"}
               </button>
 
               <button

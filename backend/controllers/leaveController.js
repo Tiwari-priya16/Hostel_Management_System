@@ -1,5 +1,6 @@
 const Leave = require("../models/Leave");
 const { validationResult } = require("express-validator");
+const { createNotification, notifyAdmins } = require("../utils/notificationHelper");
 
 // Create Leave
 exports.createLeave = async (req, res) => {
@@ -19,6 +20,9 @@ exports.createLeave = async (req, res) => {
       fromDate: req.body.fromDate,
       toDate: req.body.toDate,
     });
+
+    // Notify Admins (Async)
+    notifyAdmins(req.user.id, `New leave request from Student: ${req.user.name}`, "leave");
 
     res.status(201).json({
       success: true,
@@ -91,6 +95,14 @@ exports.approveLeave = async (req, res) => {
 
     await leave.save();
 
+    // Notify Student (Async)
+    createNotification(
+      leave.student,
+      req.user.id,
+      "Your leave request has been Approved",
+      "leave"
+    );
+
     res.status(200).json({
       success: true,
       message: "Leave approved successfully",
@@ -117,9 +129,17 @@ exports.rejectLeave = async (req, res) => {
     }
 
     leave.status = "Rejected";
-    leave.approvedBy = req.user.id;
+    leave.approvedBy = req.user._id;
 
     await leave.save();
+
+    // Notify Student
+    await createNotification(
+      leave.student,
+      req.user._id,
+      "Your leave request has been Rejected",
+      "leave"
+    );
 
     res.status(200).json({
       success: true,

@@ -7,6 +7,7 @@ import {
   approveVisitor,
   rejectVisitor,
 } from "../../services/visitorService";
+import { toast } from "react-toastify";
 
 import "../complaint/ComplaintList.css";
 import "../dashboard/dashboard.css";
@@ -36,10 +37,12 @@ function AdminVisitors() {
     id
   ) => {
     try {
+      setVisitors(prev => prev.map(item => item._id === id ? { ...item, status: "Approved" } : item));
       await approveVisitor(id);
-      fetchVisitors();
+      toast.success("Visitor Approved");
     } catch (err) {
-      console.log(err);
+      toast.error("Failed to approve");
+      fetchVisitors();
     }
   };
 
@@ -47,10 +50,12 @@ function AdminVisitors() {
     id
   ) => {
     try {
+      setVisitors(prev => prev.map(item => item._id === id ? { ...item, status: "Rejected" } : item));
       await rejectVisitor(id);
-      fetchVisitors();
+      toast.success("Visitor Rejected");
     } catch (err) {
-      console.log(err);
+      toast.error("Failed to reject");
+      fetchVisitors();
     }
   };
 

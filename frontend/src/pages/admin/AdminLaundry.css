@@ -1,0 +1,249 @@
+.admin-laundry-container {
+  padding: 20px;
+}
+
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.tab-switcher {
+  display: flex;
+  background: var(--bg-secondary);
+  padding: 5px;
+  border-radius: 14px;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--nav-shadow);
+}
+
+.tab-switcher button {
+  padding: 10px 20px;
+  border: none;
+  background: none;
+  color: var(--text-secondary);
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.tab-switcher button.active {
+  background: #2563eb;
+  color: white;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
+}
+
+/* Machines Panel */
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.panel-header h3 {
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.add-btn {
+  background: #22c55e;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-machine-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 25px;
+}
+
+.admin-machine-card {
+  background: var(--bg-secondary);
+  border-radius: 20px;
+  padding: 25px;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--nav-shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.m-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.m-card-header h4 {
+  margin: 0;
+  font-size: 18px;
+  color: var(--text-primary);
+}
+
+.m-status-pill {
+  font-size: 10px;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+}
+
+.m-card-details p {
+  margin: 0;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.m-card-details small {
+  color: var(--text-muted);
+}
+
+.m-card-actions {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+  border-top: 1px solid var(--border-color);
+  padding-top: 15px;
+}
+
+.m-card-actions button {
+  flex: 1;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.m-card-actions button:hover {
+  background: var(--border-color);
+}
+
+.m-card-actions button.warn:hover { color: #f59e0b; border-color: #f59e0b; }
+.m-card-actions button.success:hover { color: #22c55e; border-color: #22c55e; }
+.m-card-actions button.danger:hover { color: #ef4444; border-color: #ef4444; }
+
+/* Admin Table Styling */
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--bg-secondary);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: var(--nav-shadow);
+  border: 1px solid var(--border-color);
+}
+
+.admin-table th {
+  background: var(--bg-surface);
+  text-align: left;
+  padding: 18px 25px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.admin-table td {
+  padding: 18px 25px;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.status-pill {
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* Settings Panel */
+.settings-panel {
+  background: var(--bg-secondary);
+  padding: 35px;
+  border-radius: 24px;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--nav-shadow);
+  max-width: 800px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 25px;
+  margin-bottom: 30px;
+}
+
+.save-settings-btn {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+/* Modal Styling */
+.admin-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  padding: 20px;
+}
+
+.admin-modal .modal-content {
+  background: var(--bg-surface);
+  padding: 40px;
+  border-radius: 24px;
+  width: 100%;
+  max-width: 550px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+.modal-actions {
+  display: flex;
+  gap: 15px;
+  margin-top: 30px;
+}
+
+.modal-actions button {
+  flex: 1;
+  padding: 14px;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.confirm-btn { background: #2563eb; color: white; border: none; }
+.cancel-btn { background: transparent; color: var(--text-secondary); border: 1px solid var(--border-color); }

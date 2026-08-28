@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 
 import Sidebar from "../../components/sidebar/Sidebar";
 import Navbar from "../../components/navbar/Navbar";
+import { toast } from "react-toastify";
 
 import "../dashboard/dashboard.css";
 import "../notice/Notice.css";
@@ -17,6 +18,7 @@ function AdminNotice() {
 
   const [title, setTitle] = useState("");
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     fetchNotices();
@@ -35,6 +37,7 @@ function AdminNotice() {
     e.preventDefault();
 
     try {
+      setLoading(true);
       await createNotice({
         title,
         message,
@@ -45,30 +48,23 @@ function AdminNotice() {
 
       fetchNotices();
 
-      alert("Notice sent successfully");
+      toast.success("Notice sent successfully");
     } catch (error) {
-      console.log(error);
-      alert("Failed to create notice");
+      toast.error("Failed to create notice");
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleDelete = async (id) => {
-    if (
-      !window.confirm(
-        "Delete this notice?"
-      )
-    )
-      return;
+    if (!window.confirm("Delete this notice?")) return;
 
     try {
       await deleteNotice(id);
-
       fetchNotices();
-
-      alert("Notice deleted");
+      toast.success("Notice deleted");
     } catch (error) {
-      console.log(error);
-      alert("Failed to delete notice");
+      toast.error("Failed to delete notice");
     }
   };
 
@@ -107,8 +103,8 @@ function AdminNotice() {
               required
             />
 
-            <button type="submit">
-              Send Notice
+            <button type="submit" disabled={loading}>
+              {loading ? "Sending..." : "Send Notice"}
             </button>
           </form>
 

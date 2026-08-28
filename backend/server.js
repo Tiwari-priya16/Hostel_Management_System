@@ -12,6 +12,8 @@ const noticeRoutes = require("./routes/noticeRoutes");
 const leaveRoutes = require("./routes/leaveRoutes");
 const roomTransferRoutes = require("./routes/roomTransferRoutes");
 const messRoutes = require("./routes/messRoutes");
+const notificationRoutes = require("./routes/notificationRoutes");
+const gateRoutes = require("./routes/gateRoutes");
 
 dotenv.config();
 connectDB();
@@ -29,6 +31,8 @@ app.use("/api/notices", noticeRoutes);
 app.use("/api/leave", leaveRoutes);
 app.use("/api/room-transfer", roomTransferRoutes);
 app.use("/api/mess", messRoutes);
+app.use("/api/notifications", notificationRoutes);
+app.use("/api/gate", gateRoutes);
 
 app.get("/", (req, res) => {
   res.send("Hostel Management API Running...");
@@ -36,6 +40,11 @@ app.get("/", (req, res) => {
 
 const PORT = process.env.PORT || 5000;
 
+const runLaundryAutomation = require("./utils/laundryAutoJob");
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+
+  // Run laundry automation every minute
+  setInterval(runLaundryAutomation, 60000);
 });

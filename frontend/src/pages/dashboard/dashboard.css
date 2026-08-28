@@ -108,6 +108,11 @@
   margin: 4px 0 0;
 }
 
+.card-info p.card-value-small {
+  font-size: 22px;
+  line-height: 1.2;
+}
+
 /* Icon Colors & Backgrounds */
 .users-icon { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
 .complaints-icon { background: rgba(239, 68, 68, 0.1); color: #ef4444; }

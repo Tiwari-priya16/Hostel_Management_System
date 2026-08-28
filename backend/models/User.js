@@ -44,6 +44,12 @@ hostelBlock: {
   required: true,
   trim: true,
 },
+
+currentStatus: {
+  type: String,
+  enum: ["Inside Hostel", "Outside Hostel"],
+  default: "Inside Hostel",
+},
   },
   {
     timestamps: true,

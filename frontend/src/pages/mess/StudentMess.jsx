@@ -2,7 +2,7 @@ import React, { useEffect, useState, useContext } from "react";
 import Sidebar from "../../components/sidebar/Sidebar";
 import Navbar from "../../components/navbar/Navbar";
 import { getWeeklyMenu, submitMealRating, getTodayMessRatings } from "../../services/messService";
-import { FaUtensils, FaClock, FaStar, FaRegStar } from "react-icons/fa";
+import { FaUtensils, FaClock, FaStar, FaRegStar, FaChevronRight } from "react-icons/fa";
 import { toast } from "react-toastify";
 import "./Mess.css";
 
@@ -11,8 +11,15 @@ function StudentMess() {
   const [todayMenu, setTodayMenu] = useState(null);
   const [ratings, setRatings] = useState({ breakfast: { avg: 0 }, lunch: { avg: 0 }, dinner: { avg: 0 } });
   const [messStatus, setMessStatus] = useState({ isOpen: false, currentMeal: null, nextMeal: null });
-  const [showRatingPopup, setShowRatingPopup] = useState(null); // mealType
-  const [selectedRating, setSelectedRating] = useState(0);
+
+  const [showFeedbackForm, setShowFeedbackForm] = useState(null); // mealType
+  const [feedbackData, setFeedbackData] = useState({
+    foodQuality: 0,
+    cleanliness: 0,
+    taste: 0,
+    comment: ""
+  });
+  const [loading, setLoading] = useState(false);
 
   const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   const todayName = days[new Date().getDay()];
@@ -20,7 +27,7 @@ function StudentMess() {
 
   useEffect(() => {
     fetchData();
-    const timer = setInterval(checkMessStatus, 60000); // Check every minute
+    const timer = setInterval(checkMessStatus, 60000);
     return () => clearInterval(timer);
   }, []);
 
@@ -44,7 +51,9 @@ function StudentMess() {
     if (!menu) return;
 
     const now = new Date();
-    const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    const hour = now.getHours();
+    const min = now.getMinutes();
+    const currentTime = `${String(hour).padStart(2, '0')}:${String(min).padStart(2, '0')}`;
 
     let isOpen = false;
     let currentMeal = null;
@@ -71,39 +80,54 @@ function StudentMess() {
     setMessStatus({ isOpen, currentMeal, nextMeal });
   };
 
-  const handleRate = async () => {
+  const handleFeedbackSubmit = async (e) => {
+    e.preventDefault();
+    if (feedbackData.foodQuality === 0 || feedbackData.cleanliness === 0 || feedbackData.taste === 0) {
+      return toast.warning("Please provide ratings for all categories");
+    }
+
     try {
+      setLoading(true);
       await submitMealRating({
-        mealType: showRatingPopup,
-        rating: selectedRating,
+        mealType: showFeedbackForm,
+        ...feedbackData,
         date: todayDate
       });
-      toast.success("Thank you for your feedback!");
-      setShowRatingPopup(null);
-      setSelectedRating(0);
-      fetchData(); // Refresh ratings
+      toast.success("Feedback submitted! Thank you.");
+      setShowFeedbackForm(null);
+      setFeedbackData({ foodQuality: 0, cleanliness: 0, taste: 0, comment: "" });
+      fetchData();
     } catch (error) {
-      toast.error(error.response?.data?.message || "Rating failed");
+      toast.error(error.response?.data?.message || "Submission failed");
+    } finally {
+      setLoading(false);
     }
   };
 
-  const renderStars = (rating, interactive = false) => {
-    return (
-      <div className="stars">
-        {[1, 2, 3, 4, 5].map(star => (
-          interactive ? (
-            <FaStar
-              key={star}
-              className={`star-icon ${star <= selectedRating ? 'active' : ''}`}
-              onClick={() => setSelectedRating(star)}
-            />
-          ) : (
-            star <= Math.round(rating) ? <FaStar key={star} /> : <FaRegStar key={star} />
-          )
-        ))}
-      </div>
-    );
+  const isMealPast = (type) => {
+    const now = new Date();
+    const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+    const mealTimes = {
+      breakfast: "10:00",
+      lunch: "14:30",
+      dinner: "22:00"
+    };
+
+    return currentTime > mealTimes[type];
   };
+
+  const renderStarInput = (field) => (
+    <div className="stars-row">
+      {[1, 2, 3, 4, 5].map(star => (
+        <FaStar
+          key={star}
+          className={`star-icon ${star <= feedbackData[field] ? 'active' : ''}`}
+          onClick={() => setFeedbackData({ ...feedbackData, [field]: star })}
+        />
+      ))}
+    </div>
+  );
 
   return (
     <div className="dashboard-container">
@@ -112,19 +136,19 @@ function StudentMess() {
         <Navbar />
 
         <div className="mess-container">
-          <h1 className="dashboard-title">Mess Menu</h1>
+          <h1 className="dashboard-title">Mess Menu & Feedback</h1>
 
           {/* Real-time Status Card */}
           <div className="mess-status-card">
             <div className="status-info">
-              <h2>{messStatus.isOpen ? `Mess is serving ${messStatus.currentMeal.name}` : "Mess is currently closed"}</h2>
+              <h2>{messStatus.isOpen ? `Currently Serving: ${messStatus.currentMeal.name}` : "Mess is currently closed"}</h2>
               <p>
                 <FaClock style={{ marginRight: '8px' }} />
                 {messStatus.isOpen
                   ? `Ends at ${messStatus.currentMeal.endTime}`
                   : messStatus.nextMeal
                     ? `Next meal: ${messStatus.nextMeal.name} at ${messStatus.nextMeal.startTime}`
-                    : "See you tomorrow!"}
+                    : "See you tomorrow morning!"}
               </p>
             </div>
             <div className={`status-badge ${messStatus.isOpen ? 'open' : 'closed'}`}>
@@ -137,56 +161,87 @@ function StudentMess() {
               const meal = todayMenu?.[type];
               if (!meal) return null;
 
-              const isServing = messStatus.isOpen && messStatus.currentMeal?.type === type;
+              const isCurrent = messStatus.isOpen && messStatus.currentMeal?.type === type;
+              const isPast = isMealPast(type);
 
               return (
-                <div key={type} className={`meal-card ${isServing ? 'active' : ''}`}>
-                  <div className="meal-header">
-                    <h3><FaUtensils style={{ marginRight: '10px', color: '#2563eb' }} /> {type}</h3>
-                    <span className="meal-time">{meal.startTime} - {meal.endTime}</span>
-                  </div>
+                <React.Fragment key={type}>
+                  <div className={`meal-card ${isCurrent ? 'active' : ''}`}>
+                    <div className="meal-header">
+                      <h3><FaUtensils style={{ color: '#2563eb' }} /> {type}</h3>
+                      <span className="meal-time">{meal.startTime} - {meal.endTime}</span>
+                    </div>
 
-                  <div className="meal-content">
-                    <div className="items-list">
-                      {meal.items.map((item, i) => (
-                        <span key={i} className="item-tag">{item}</span>
-                      ))}
+                    <div className="meal-content">
+                      <div className="items-list">
+                        {meal.items.map((item, i) => (
+                          <span key={i} className="item-tag">{item}</span>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="meal-footer">
+                      <div className="footer-top">
+                        <div className="rating-display">
+                          <FaStar /> <span>{ratings[type]?.avg || "0.0"}</span>
+                          <small style={{ color: 'var(--text-muted)', marginLeft: '5px' }}>
+                            ({ratings[type]?.count || 0} reviews)
+                          </small>
+                        </div>
+                        <button
+                          className="rate-btn"
+                          onClick={() => setShowFeedbackForm(showFeedbackForm === type ? null : type)}
+                          disabled={!isCurrent && !isPast}
+                        >
+                          {showFeedbackForm === type ? "Close Form" : "Give Feedback"}
+                        </button>
+                      </div>
+                      {!isCurrent && !isPast && (
+                        <p style={{ margin: 0, fontSize: '11px', color: 'var(--text-muted)' }}>
+                          Feedback opens once meal starts
+                        </p>
+                      )}
                     </div>
                   </div>
 
-                  <div className="meal-footer">
-                    <div className="rating-display">
-                      {renderStars(ratings[type]?.avg)}
-                      <span>({ratings[type]?.avg})</span>
+                  {/* Integrated Feedback Form */}
+                  {showFeedbackForm === type && (
+                    <div className="active-feedback-section">
+                      <form className="feedback-form-container" onSubmit={handleFeedbackSubmit}>
+                        <h2>Rate Today's {type}</h2>
+                        <div className="rating-grid">
+                          <div className="rating-item">
+                            <label>Food Quality</label>
+                            {renderStarInput('foodQuality')}
+                          </div>
+                          <div className="rating-item">
+                            <label>Cleanliness</label>
+                            {renderStarInput('cleanliness')}
+                          </div>
+                          <div className="rating-item">
+                            <label>Taste</label>
+                            {renderStarInput('taste')}
+                          </div>
+                        </div>
+
+                        <textarea
+                          className="feedback-textarea"
+                          placeholder="Share your experience or suggestions..."
+                          value={feedbackData.comment}
+                          onChange={(e) => setFeedbackData({ ...feedbackData, comment: e.target.value })}
+                        />
+
+                        <button type="submit" className="submit-feedback-btn" disabled={loading}>
+                          {loading ? "Submitting..." : "Submit Feedback"}
+                        </button>
+                      </form>
                     </div>
-                    <button
-                      className="rate-btn"
-                      onClick={() => setShowRatingPopup(type)}
-                      disabled={!isServing}
-                    >
-                      Rate Meal
-                    </button>
-                  </div>
-                </div>
+                  )}
+                </React.Fragment>
               );
             })}
           </div>
         </div>
-
-        {/* Rating Popup */}
-        {showRatingPopup && (
-          <div className="rating-popup">
-            <div className="rating-card">
-              <h3>Rate Today's {showRatingPopup}</h3>
-              <p>How was the quality and taste?</p>
-              {renderStars(0, true)}
-              <div style={{ display: 'flex', gap: '10px' }}>
-                <button className="rate-btn" style={{ flex: 1, background: '#64748b' }} onClick={() => setShowRatingPopup(null)}>Cancel</button>
-                <button className="submit-rating-btn" style={{ flex: 2 }} onClick={handleRate} disabled={selectedRating === 0}>Submit</button>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );

@@ -1,5 +1,6 @@
 const Notice = require("../models/Notice");
 const { validationResult } = require("express-validator");
+const { notifyAllStudents } = require("../utils/notificationHelper");
 
 // Create Notice (Admin)
 exports.createNotice = async (req, res) => {
@@ -18,6 +19,9 @@ exports.createNotice = async (req, res) => {
       message: req.body.message,
       postedBy: req.user.id,
     });
+
+    // Notify all students
+    await notifyAllStudents(req.user.id, `New Notice: ${req.body.title}`, "notice");
 
     res.status(201).json({
       success: true,

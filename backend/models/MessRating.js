@@ -12,11 +12,27 @@ const messRatingSchema = new mongoose.Schema(
       enum: ["breakfast", "lunch", "dinner"],
       required: true,
     },
-    rating: {
+    foodQuality: {
       type: Number,
       required: true,
       min: 1,
       max: 5,
+    },
+    cleanliness: {
+      type: Number,
+      required: true,
+      min: 1,
+      max: 5,
+    },
+    taste: {
+      type: Number,
+      required: true,
+      min: 1,
+      max: 5,
+    },
+    comment: {
+      type: String,
+      trim: true,
     },
     date: {
       type: String, // YYYY-MM-DD

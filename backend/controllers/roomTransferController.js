@@ -1,15 +1,19 @@
 const RoomTransfer = require("../models/RoomTransfer");
+const { createNotification, notifyAdmins } = require("../utils/notificationHelper");
 
 
 // Student apply
 exports.applyRoomTransfer = async (req, res) => {
   try {
     const transfer = await RoomTransfer.create({
-      student: req.user.id,
+      student: req.user._id,
       currentRoom: req.body.currentRoom,
       requestedRoom: req.body.requestedRoom,
       reason: req.body.reason,
     });
+
+    // Notify Admins
+    await notifyAdmins(req.user._id, `New Room Transfer Request from Student ${req.user.name}`, "room-transfer");
 
     res.status(201).json({
       success: true,
@@ -29,7 +33,7 @@ exports.applyRoomTransfer = async (req, res) => {
 exports.getMyTransfers = async (req, res) => {
   try {
     const transfers = await RoomTransfer.find({
-      student: req.user.id,
+      student: req.user._id,
     });
 
     res.json({
@@ -82,9 +86,12 @@ exports.approveTransfer = async (req, res) => {
     }
 
     transfer.status = "Approved";
-    transfer.approvedBy = req.user.id;
+    transfer.approvedBy = req.user._id;
 
     await transfer.save();
+
+    // Notify Student
+    await createNotification(transfer.student, req.user._id, `Your room transfer request to ${transfer.requestedRoom} has been Approved`, "room-transfer");
 
     res.json({
       success: true,
@@ -115,9 +122,12 @@ exports.rejectTransfer = async (req, res) => {
     }
 
     transfer.status = "Rejected";
-    transfer.approvedBy = req.user.id;
+    transfer.approvedBy = req.user._id;
 
     await transfer.save();
+
+    // Notify Student
+    await createNotification(transfer.student, req.user._id, `Your room transfer request to ${transfer.requestedRoom} has been Rejected`, "room-transfer");
 
     res.json({
       success: true,

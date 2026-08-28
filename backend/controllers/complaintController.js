@@ -1,8 +1,8 @@
 const Complaint = require("../models/Complaint");
+const User = require("../models/User");
+const { createNotification, notifyAdmins } = require("../utils/notificationHelper");
 
 // Create Complaint
-const User = require("../models/User");
-
 const createComplaint = async (req, res) => {
   try {
     const {
@@ -22,6 +22,9 @@ const createComplaint = async (req, res) => {
       roomNumber: user.roomNumber,
       raisedBy: req.user._id,
     });
+
+    // Notify Admins (Async)
+    notifyAdmins(req.user._id, `New complaint raised: ${title}`, "complaint");
 
     res.status(201).json({
       success: true,
@@ -92,6 +95,14 @@ const updateComplaintStatus = async (req, res) => {
     complaint.status = req.body.status;
 
     await complaint.save();
+
+    // Notify Student (Async)
+    createNotification(
+      complaint.raisedBy,
+      req.user._id,
+      `Your complaint "${complaint.title}" status has been updated to ${req.body.status}`,
+      "complaint"
+    );
 
     res.status(200).json({
       success: true,

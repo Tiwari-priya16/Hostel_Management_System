@@ -11,7 +11,11 @@ function AdminMess() {
   const [selectedDay, setSelectedDay] = useState(new Date().toLocaleDateString('en-IN', { weekday: 'long' }));
   const [editMode, setEditMode] = useState(null); // mealType
   const [tempItems, setEditItems] = useState("");
-  const [ratings, setRatings] = useState({ breakfast: { avg: 0, count: 0 }, lunch: { avg: 0, count: 0 }, dinner: { avg: 0, count: 0 } });
+  const [ratings, setRatings] = useState({
+    breakfast: { avg: 0, count: 0, feedback: [] },
+    lunch: { avg: 0, count: 0, feedback: [] },
+    dinner: { avg: 0, count: 0, feedback: [] }
+  });
 
   const todayDate = new Date().toISOString().split('T')[0];
 
@@ -124,6 +128,27 @@ function AdminMess() {
                       <div className="items-list">
                         {meal.items.map((item, i) => (
                           <span key={i} className="item-tag">{item}</span>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Meal Feedback List for Admin */}
+                    {!editMode && ratings[type]?.feedback?.length > 0 && (
+                      <div className="meal-feedback-list">
+                        <h4>Student Feedback ({ratings[type].count})</h4>
+                        {ratings[type].feedback.map((f, i) => (
+                          <div key={i} className="feedback-item">
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                              <span className="feedback-user">{f.user} (Room {f.room})</span>
+                              <span className="feedback-rating">⭐ {f.avg}</span>
+                            </div>
+                            <div style={{ display: 'flex', gap: '15px', fontSize: '11px', color: 'var(--text-muted)', marginBottom: '8px' }}>
+                              <span>Food: {f.ratings.food}</span>
+                              <span>Clean: {f.ratings.clean}</span>
+                              <span>Taste: {f.ratings.taste}</span>
+                            </div>
+                            <p className="feedback-comment">{f.comment}</p>
+                          </div>
                         ))}
                       </div>
                     )}

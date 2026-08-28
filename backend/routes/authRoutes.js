@@ -8,6 +8,8 @@ const {
   getStudents,
   getStaff,
   updateUserProfile,
+  forgotPassword,
+  resetPassword,
 } = require("../controllers/authController");
 
 // Middleware
@@ -44,6 +46,9 @@ router.post(
   validate,
   loginUser
 );
+
+router.post("/forgot-password", forgotPassword);
+router.post("/reset-password", resetPassword);
 
 
 // Logged-in User Profile
