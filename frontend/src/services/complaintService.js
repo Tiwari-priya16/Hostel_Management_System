@@ -22,11 +22,16 @@ export const getComplaintAnalytics = () => {
 
 export const updateComplaintStatus = (
   id,
-  status
+  statusOrData
 ) => {
+  const payload =
+    typeof statusOrData === "string"
+      ? { status: statusOrData }
+      : statusOrData;
+
   return API.put(
     `/complaints/${id}/status`,
-    { status }
+    payload
   );
 };
 

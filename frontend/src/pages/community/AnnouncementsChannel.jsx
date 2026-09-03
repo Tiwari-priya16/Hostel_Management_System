@@ -23,6 +23,12 @@ function AnnouncementsChannel({ user, onImageClick }) {
   const [attachmentPreview, setAttachmentPreview] = useState(null);
   const [submitting, setSubmitting] = useState(false);
 
+  const EMOJI_LIST = ["📢", "📌", "🚨", "⚠️", "💡", "🗓️", "🕒", "🎉", "💯", "ℹ️", "👏", "🙌"];
+
+  const addEmoji = (emoji) => {
+    setContent(prev => prev + emoji);
+  };
+
   const galleryInputRef = useRef(null);
   const cameraInputRef = useRef(null);
 
@@ -123,7 +129,7 @@ function AnnouncementsChannel({ user, onImageClick }) {
   };
 
   return (
-    <div>
+    <div className="channel-view-container">
       {/* Hidden File Inputs */}
       <input
         type="file"
@@ -141,15 +147,13 @@ function AnnouncementsChannel({ user, onImageClick }) {
         onChange={handleFileSelect}
       />
 
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "25px" }}>
+      <div className="channel-view-header">
         <div>
-          <h2 style={{ margin: 0, color: "var(--text-primary)" }}>
+          <h2>
             <FaBullhorn style={{ color: "#2563eb", marginRight: "10px" }} />
             Hostel Announcements
           </h2>
-          <p style={{ margin: "5px 0 0", color: "var(--text-muted)", fontSize: "14px" }}>
-            Official notices and updates from Hostel Administration
-          </p>
+          <p>Official notices and updates from Hostel Administration</p>
         </div>
 
         {isAdminOrStaff && (
@@ -160,7 +164,7 @@ function AnnouncementsChannel({ user, onImageClick }) {
       </div>
 
       {!isAdminOrStaff && (
-        <div style={{ background: "rgba(37, 99, 235, 0.08)", border: "1px solid rgba(37, 99, 235, 0.2)", padding: "12px 20px", borderRadius: "12px", marginBottom: "20px", display: "flex", alignItems: "center", gap: "10px", fontSize: "13px", color: "var(--text-primary)" }}>
+        <div className="info-banner">
           <FaLock style={{ color: "#2563eb" }} />
           <span>Announcements are read-only for students. Only Wardens and Admins can post announcements.</span>
         </div>
@@ -243,6 +247,12 @@ function AnnouncementsChannel({ user, onImageClick }) {
             </div>
 
             <form onSubmit={handleCreateAnnouncement}>
+              <div className="quick-emoji-row">
+                {EMOJI_LIST.map((e, idx) => (
+                  <span key={idx} className="emoji-item" onClick={() => addEmoji(e)}>{e}</span>
+                ))}
+              </div>
+
               <textarea
                 className="feedback-textarea"
                 placeholder="Write announcement details..."

@@ -9,6 +9,7 @@ const createComplaint = async (req, res) => {
       title,
       description,
       category,
+      photo,
     } = req.body;
 
     const user = await User.findById(
@@ -19,6 +20,7 @@ const createComplaint = async (req, res) => {
       title,
       description,
       category,
+      photo: photo || "",
       roomNumber: user.roomNumber,
       raisedBy: req.user._id,
     });
@@ -93,6 +95,14 @@ const updateComplaintStatus = async (req, res) => {
     }
 
     complaint.status = req.body.status;
+
+    if (req.body.resolutionPhoto !== undefined) {
+      complaint.resolutionPhoto = req.body.resolutionPhoto;
+    }
+
+    if (req.body.resolutionNote !== undefined) {
+      complaint.resolutionNote = req.body.resolutionNote;
+    }
 
     await complaint.save();
 

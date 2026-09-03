@@ -50,6 +50,11 @@ currentStatus: {
   enum: ["Inside Hostel", "Outside Hostel"],
   default: "Inside Hostel",
 },
+
+profilePic: {
+  type: String,
+  default: "",
+},
   },
   {
     timestamps: true,

@@ -1,5 +1,7 @@
 const express = require("express");
 const dotenv = require("dotenv");
+dotenv.config();
+
 const cors = require("cors");
 const connectDB = require("./config/db");
 
@@ -14,8 +16,9 @@ const roomTransferRoutes = require("./routes/roomTransferRoutes");
 const messRoutes = require("./routes/messRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
 const gateRoutes = require("./routes/gateRoutes");
+const uploadRoutes = require("./routes/uploadRoutes");
+const communityRoutes = require("./routes/communityRoutes");
 
-dotenv.config();
 connectDB();
 
 const app = express();
@@ -33,6 +36,8 @@ app.use("/api/room-transfer", roomTransferRoutes);
 app.use("/api/mess", messRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/gate", gateRoutes);
+app.use("/api/upload", uploadRoutes);
+app.use("/api/community", communityRoutes);
 
 app.get("/", (req, res) => {
   res.send("Hostel Management API Running...");

@@ -1,10 +1,22 @@
 const cloudinary = require("cloudinary").v2;
 
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
+/**
+ * Ensures Cloudinary is configured with latest environment variables
+ */
+const configureCloudinary = () => {
+  // Ensure dotenv is loaded if process.env isn't populated yet
+  if (!process.env.CLOUDINARY_CLOUD_NAME && require("dotenv")) {
+    require("dotenv").config();
+  }
+
+  cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+  });
+
+  return cloudinary;
+};
 
 /**
  * Uploads a file buffer to Cloudinary
@@ -12,10 +24,12 @@ cloudinary.config({
  * @param {String} folder - Folder name in Cloudinary
  * @returns {Promise<Object>} Cloudinary upload result
  */
-const uploadToCloudinary = (fileBuffer, folder = "hostelsync") => {
+const uploadToCloudinary = (fileBuffer, folder = "HostelSync/others") => {
   return new Promise((resolve, reject) => {
+    configureCloudinary();
+
     if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
-      return reject(new Error("Cloudinary credentials are not configured in backend .env file"));
+      return reject(new Error("Cloudinary credentials (CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET) are missing or not set in backend .env file"));
     }
 
     const uploadStream = cloudinary.uploader.upload_stream(
@@ -37,5 +51,6 @@ const uploadToCloudinary = (fileBuffer, folder = "hostelsync") => {
 
 module.exports = {
   cloudinary,
+  configureCloudinary,
   uploadToCloudinary,
 };

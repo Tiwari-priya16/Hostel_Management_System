@@ -24,8 +24,14 @@ function LostFoundChannel({ user, onImageClick }) {
   const [attachmentPreview, setAttachmentPreview] = useState(null);
   const [submitting, setSubmitting] = useState(false);
 
+  const EMOJI_LIST = ["🔍", "✨", "🎒", "🔑", "📱", "💻", "💳", "🎧", "⚡", "📍", "🏠", "ℹ️"];
+
   const galleryInputRef = useRef(null);
   const cameraInputRef = useRef(null);
+
+  const addEmoji = (emoji) => {
+    setDescription(prev => prev + emoji);
+  };
 
   useEffect(() => {
     fetchItems();
@@ -117,7 +123,7 @@ function LostFoundChannel({ user, onImageClick }) {
   };
 
   return (
-    <div>
+    <div className="channel-view-container">
       {/* Hidden File Inputs */}
       <input
         type="file"
@@ -135,15 +141,13 @@ function LostFoundChannel({ user, onImageClick }) {
         onChange={handleFileSelect}
       />
 
-      <div className="lost-found-filter-bar">
+      <div className="channel-view-header">
         <div>
-          <h2 style={{ margin: 0, color: "var(--text-primary)" }}>
+          <h2>
             <FaSearch style={{ color: "#2563eb", marginRight: "10px" }} />
             Lost & Found Desk
           </h2>
-          <p style={{ margin: "5px 0 0", color: "var(--text-muted)", fontSize: "14px" }}>
-            Report lost belongings or post items you found around the hostel campus
-          </p>
+          <p>Report lost belongings or post items you found around the hostel campus</p>
         </div>
 
         <button className="create-post-btn" onClick={() => setShowModal(true)}>
@@ -152,7 +156,7 @@ function LostFoundChannel({ user, onImageClick }) {
       </div>
 
       {/* Filter Tabs */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "25px", flexWrap: "wrap", gap: "15px" }}>
+      <div className="filter-tabs-row">
         <div className="filter-pills">
           <button
             className={`filter-pill ${filterTag === "ALL" ? "active" : ""}`}
@@ -282,6 +286,11 @@ function LostFoundChannel({ user, onImageClick }) {
 
               <div style={{ marginBottom: "18px" }}>
                 <label className="section-label">Details / Description</label>
+                <div className="quick-emoji-row" style={{ marginBottom: "8px" }}>
+                  {EMOJI_LIST.map((e, idx) => (
+                    <span key={idx} className="emoji-item" onClick={() => addEmoji(e)}>{e}</span>
+                  ))}
+                </div>
                 <textarea
                   className="feedback-textarea"
                   placeholder="Describe the item, where it was lost/found, and how to reach you..."

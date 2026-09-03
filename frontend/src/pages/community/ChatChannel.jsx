@@ -8,7 +8,7 @@ import { compressAndResizeImage, uploadImageToCloudinary } from "../../services/
 import { toast } from "react-toastify";
 import {
   FaPaperPlane, FaImage, FaCamera, FaTimes, FaTrash,
-  FaUser, FaSpinner, FaComments, FaExclamationTriangle
+  FaUser, FaSpinner, FaComments, FaSmile
 } from "react-icons/fa";
 
 function ChatChannel({ channelType, blockName, user, onImageClick }) {
@@ -16,8 +16,15 @@ function ChatChannel({ channelType, blockName, user, onImageClick }) {
   const [inputText, setInputText] = useState("");
   const [selectedFile, setSelectedFile] = useState(null);
   const [attachmentPreview, setAttachmentPreview] = useState(null);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [loading, setLoading] = useState(false);
   const [sending, setSending] = useState(false);
+
+  const EMOJI_LIST = ["😀", "😂", "😊", "😍", "👍", "👎", "🔥", "🎉", "💯", "📌", "🔍", "💡", "👏", "🙌", "🙏", "🚀", "📍", "🏠", "🧼", "⚡", "☕", "📢", "❤️", "✨", "🎒", "🔑", "📱", "💻"];
+
+  const addEmoji = (emoji) => {
+    setInputText(prev => prev + emoji);
+  };
 
   const messagesEndRef = useRef(null);
   const galleryInputRef = useRef(null);
@@ -213,6 +220,16 @@ function ChatChannel({ channelType, blockName, user, onImageClick }) {
 
       {/* Composer Bar */}
       <form className="chat-composer-bar" onSubmit={handleSendMessage}>
+        {showEmojiPicker && (
+          <div className="emoji-picker-popover">
+            {EMOJI_LIST.map((emoji, idx) => (
+              <span key={idx} className="emoji-item" onClick={() => addEmoji(emoji)}>
+                {emoji}
+              </span>
+            ))}
+          </div>
+        )}
+
         {attachmentPreview && (
           <div className="attachment-preview-box">
             <img src={attachmentPreview} alt="Preview" />
@@ -223,6 +240,15 @@ function ChatChannel({ channelType, blockName, user, onImageClick }) {
         )}
 
         <div className="composer-row">
+          <button
+            type="button"
+            className="icon-action-btn"
+            title="Emoji Picker"
+            onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+          >
+            <FaSmile />
+          </button>
+
           <input
             type="text"
             className="composer-input"

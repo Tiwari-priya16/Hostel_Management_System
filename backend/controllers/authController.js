@@ -228,6 +228,10 @@ const updateUserProfile = async (req, res) => {
       user.roomNumber = req.body.roomNumber || user.roomNumber;
       user.hostelBlock = req.body.hostelBlock || user.hostelBlock;
 
+      if (req.body.profilePic !== undefined) {
+        user.profilePic = req.body.profilePic;
+      }
+
       if (req.body.password) {
         const salt = await bcrypt.genSalt(10);
         user.password = await bcrypt.hash(req.body.password, salt);

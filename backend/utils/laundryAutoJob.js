@@ -1,9 +1,15 @@
+const mongoose = require("mongoose");
 const LaundryBooking = require("../models/LaundryBooking");
 const WashingMachine = require("../models/WashingMachine");
 const LaundrySettings = require("../models/LaundrySettings");
 const { createNotification } = require("./notificationHelper");
 
 const runLaundryAutomation = async () => {
+  // Only run if MongoDB connection is active
+  if (mongoose.connection.readyState !== 1) {
+    return;
+  }
+
   try {
     const now = new Date();
     const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;

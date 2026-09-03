@@ -37,6 +37,7 @@ import StudentMess from "./pages/mess/StudentMess";
 import Profile from "./pages/profile/Profile";
 import EntryExit from "./pages/gate/EntryExit";
 import AdminGateControl from "./pages/admin/AdminGateControl";
+import CommunityHub from "./pages/community/CommunityHub";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -311,6 +312,15 @@ function App() {
           element={
             <ProtectedRoute>
               <AdminGateControl />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/community"
+          element={
+            <ProtectedRoute>
+              <CommunityHub />
             </ProtectedRoute>
           }
         />

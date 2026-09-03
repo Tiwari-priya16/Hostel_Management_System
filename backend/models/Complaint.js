@@ -48,6 +48,21 @@ const complaintSchema = new mongoose.Schema(
       ref: "User",
       default: null,
     },
+
+    photo: {
+      type: String,
+      default: "",
+    },
+
+    resolutionPhoto: {
+      type: String,
+      default: "",
+    },
+
+    resolutionNote: {
+      type: String,
+      default: "",
+    },
   },
   {
     timestamps: true,

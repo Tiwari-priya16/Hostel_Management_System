@@ -1,8 +1,9 @@
-const { uploadToCloudinary, cloudinary } = require("../utils/cloudinary");
+const { uploadToCloudinary, configureCloudinary, cloudinary } = require("../utils/cloudinary");
 
 const uploadImage = async (req, res) => {
   try {
     let imageUrl = "";
+    configureCloudinary();
 
     if (req.file) {
       // Check file size (2MB limit = 2 * 1024 * 1024 bytes)
@@ -13,7 +14,7 @@ const uploadImage = async (req, res) => {
         });
       }
 
-      const folder = req.body.folder || "hostelsync";
+      const folder = req.body.folder || "HostelSync/others";
       const result = await uploadToCloudinary(req.file.buffer, folder);
       imageUrl = result.secure_url;
     } else if (req.body.image) {
@@ -31,7 +32,7 @@ const uploadImage = async (req, res) => {
         });
       }
 
-      const folder = req.body.folder || "hostelsync";
+      const folder = req.body.folder || "HostelSync/others";
       const result = await cloudinary.uploader.upload(base64String, {
         folder: folder,
         transformation: [

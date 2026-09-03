@@ -91,7 +91,7 @@ export const compressAndResizeImage = (file) => {
  * @param {String} folder - Optional folder name
  * @returns {Promise<String>} - Secure Cloudinary image URL
  */
-export const uploadImageToCloudinary = async (file, folder = "hostelsync") => {
+export const uploadImageToCloudinary = async (file, folder = "HostelSync/others") => {
   const formData = new FormData();
   formData.append("image", file);
   formData.append("folder", folder);

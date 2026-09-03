@@ -16,6 +16,7 @@ import {
   FaUtensils,
   FaUser,
   FaWalking,
+  FaComments,
 } from "react-icons/fa";
 
 function Sidebar() {
@@ -64,6 +65,16 @@ function Sidebar() {
         >
           <FaUser />
           My Profile
+        </NavLink>
+
+        <NavLink
+          to="/community"
+          className={({ isActive }) =>
+            isActive ? "active-link" : ""
+          }
+        >
+          <FaComments />
+          Community Hub
         </NavLink>
 
         {/* Student Links */}

@@ -85,6 +85,7 @@ function Navbar() {
       "/room-transfer": "Room Transfer Request",
       "/room-transfer/history": "Transfer History",
       "/notices": "Notice Board",
+      "/community": "Community Hub",
       "/profile": "My Profile",
     };
     return titles[path] || "HostelSync";
@@ -186,7 +187,11 @@ function Navbar() {
             <span className="user-name">{user?.name || "User"}</span>
             <span className="user-role">{user?.role || "Student"}</span>
           </div>
-          <FaUserCircle className="user-avatar" />
+          {user?.profilePic ? (
+            <img src={user.profilePic} alt={user.name} className="user-avatar-img" />
+          ) : (
+            <FaUserCircle className="user-avatar" />
+          )}
         </div>
       </div>
     </div>
