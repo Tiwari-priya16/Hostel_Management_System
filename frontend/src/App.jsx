@@ -92,6 +92,15 @@ function App() {
         />
 
         <Route
+          path="/dashboard/warden"
+          element={
+            <ProtectedRoute>
+              <StaffDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
           path="/complaints"
           element={
             <ProtectedRoute>

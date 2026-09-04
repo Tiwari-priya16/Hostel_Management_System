@@ -32,7 +32,7 @@ function AnnouncementsChannel({ user, onImageClick }) {
   const galleryInputRef = useRef(null);
   const cameraInputRef = useRef(null);
 
-  const isAdminOrStaff = user?.role === "admin" || user?.role === "staff";
+  const isAuthorizedPoster = user?.role === "admin" || user?.role === "warden" || user?.role === "staff";
 
   useEffect(() => {
     fetchAnnouncements();
@@ -156,14 +156,14 @@ function AnnouncementsChannel({ user, onImageClick }) {
           <p>Official notices and updates from Hostel Administration</p>
         </div>
 
-        {isAdminOrStaff && (
+        {isAuthorizedPoster && (
           <button className="create-post-btn" onClick={() => setShowCreateModal(true)}>
             <FaPlus /> New Announcement
           </button>
         )}
       </div>
 
-      {!isAdminOrStaff && (
+      {!isAuthorizedPoster && (
         <div className="info-banner">
           <FaLock style={{ color: "#2563eb" }} />
           <span>Announcements are read-only for students. Only Wardens and Admins can post announcements.</span>
@@ -201,14 +201,16 @@ function AnnouncementsChannel({ user, onImageClick }) {
                   <div>
                     <strong style={{ color: "var(--text-primary)", fontSize: "15px" }}>{item.sender?.name}</strong>
                     <div style={{ fontSize: "12px", color: "var(--text-muted)", display: "flex", gap: "8px", alignItems: "center" }}>
-                      <span className="msg-tag-badge">Warden / Admin</span>
+                      <span className="msg-tag-badge">
+                        {item.sender?.role === "admin" ? "Super Admin" : item.sender?.role === "warden" ? `Warden (${item.sender?.hostelBlock || "Hostel"})` : "Warden / Staff"}
+                      </span>
                       <span>•</span>
                       <span>{new Date(item.createdAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}</span>
                     </div>
                   </div>
                 </div>
 
-                {isAdminOrStaff && (
+                {isAuthorizedPoster && (
                   <div className="announcement-admin-actions">
                     <button onClick={() => handleTogglePin(item._id)}>
                       <FaThumbtack /> {item.isPinned ? "Unpin" : "Pin"}

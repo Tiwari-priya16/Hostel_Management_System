@@ -71,9 +71,9 @@ const sendMessage = async (req, res) => {
       return res.status(400).json({ success: false, message: "Invalid channelType" });
     }
 
-    // 1. Announcements restriction: Only Admin/Staff can post
-    if (channelType === "announcement" && req.user.role !== "admin" && req.user.role !== "staff") {
-      return res.status(403).json({ success: false, message: "Only Admins/Wardens can create announcements" });
+    // 1. Announcements restriction: Only Admin/Warden/Staff can post
+    if (channelType === "announcement" && !["admin", "warden", "staff"].includes(req.user.role)) {
+      return res.status(403).json({ success: false, message: "Only Wardens and Admins can create announcements" });
     }
 
     // 2. Content or Image requirement
@@ -84,7 +84,7 @@ const sendMessage = async (req, res) => {
     // 3. Channel specific logic
     let targetBlock = "";
     if (channelType === "block") {
-      targetBlock = (req.user.role === "admin" || req.user.role === "staff")
+      targetBlock = ["admin", "warden", "staff"].includes(req.user.role)
         ? (block || req.user.hostelBlock)
         : req.user.hostelBlock;
 
@@ -159,8 +159,8 @@ const togglePinAnnouncement = async (req, res) => {
       return res.status(404).json({ success: false, message: "Announcement not found" });
     }
 
-    if (req.user.role !== "admin" && req.user.role !== "staff") {
-      return res.status(403).json({ success: false, message: "Only Admins can pin announcements" });
+    if (!["admin", "warden", "staff"].includes(req.user.role)) {
+      return res.status(403).json({ success: false, message: "Only Wardens and Admins can pin announcements" });
     }
 
     message.isPinned = !message.isPinned;

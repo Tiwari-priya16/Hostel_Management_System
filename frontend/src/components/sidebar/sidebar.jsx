@@ -162,6 +162,71 @@ function Sidebar() {
           </>
         )}
 
+        {/* Warden / Caretaker / Staff Links */}
+        {(role === "warden" || role === "staff") && (
+          <>
+            <NavLink
+              to="/admin/complaints"
+              className={({ isActive }) =>
+                isActive ? "active-link" : ""
+              }
+            >
+              <FaClipboardList />
+              Complaints
+            </NavLink>
+
+            <NavLink
+              to="/admin/leaves"
+              className={({ isActive }) =>
+                isActive ? "active-link" : ""
+              }
+            >
+              <FaCalendarAlt />
+              Leave Approvals
+            </NavLink>
+
+            <NavLink
+              to="/admin/gate"
+              className={({ isActive }) =>
+                isActive ? "active-link" : ""
+              }
+            >
+              <FaWalking />
+              Gate & Curfew
+            </NavLink>
+
+            <NavLink
+              to="/admin/laundry"
+              className={({ isActive }) =>
+                isActive ? "active-link" : ""
+              }
+            >
+              <FaTshirt />
+              Laundry Care
+            </NavLink>
+
+            <NavLink
+              to="/admin/visitors"
+              className={({ isActive }) =>
+                isActive ? "active-link" : ""
+              }
+            >
+              <FaUsers />
+              Visitors Log
+            </NavLink>
+
+            <NavLink
+              to="/admin/notices"
+              className={({ isActive }) =>
+                isActive ? "active-link" : ""
+              }
+            >
+              <FaBullhorn />
+              Notices
+            </NavLink>
+          </>
+        )}
+
         {/* Admin Links */}
         {role === "admin" && (
           <>

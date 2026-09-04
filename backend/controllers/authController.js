@@ -94,13 +94,21 @@ const registerUser = async (req, res) => {
       hostelBlock,
     } = req.body;
 
+    // Prevent public Admin registration
+    if (role === "admin") {
+      return res.status(403).json({
+        success: false,
+        message: "Admin accounts cannot be registered publicly.",
+      });
+    }
+
     // Check if user exists
     const userExists = await User.findOne({ email });
 
     if (userExists) {
       return res.status(400).json({
         success: false,
-        message: "User already exists",
+        message: "User already exists with this email",
       });
     }
 
@@ -108,16 +116,20 @@ const registerUser = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
+    const userRole = role || "student";
+    const userRoom = (userRole === "warden" || userRole === "staff") && !roomNumber
+      ? "Warden Office"
+      : roomNumber;
+
     // Create user
     const user = await User.create({
       name,
       email,
       password: hashedPassword,
-       role: role || "student",
+      role: userRole,
       phone,
-      roomNumber,
+      roomNumber: userRoom,
       hostelBlock,
-    
     });
 
     user.password = undefined;
@@ -135,8 +147,6 @@ const registerUser = async (req, res) => {
     });
   }
 };
-
-
 
 const getStudents = async (req, res) => {
   try {
@@ -160,7 +170,7 @@ const getStudents = async (req, res) => {
 const getStaff = async (req, res) => {
   try {
     const staff = await User.find(
-      { role: "staff" },
+      { role: { $in: ["staff", "warden"] } },
       "-password"
     );
 
@@ -175,7 +185,6 @@ const getStaff = async (req, res) => {
     });
   }
 };
-
 
 const loginUser = async (req, res) => {
   try {

@@ -12,7 +12,7 @@ const {
 router.post("/exit", protect, recordExit);
 router.post("/entry", protect, recordEntry);
 router.get("/my-history", protect, getMyHistory);
-router.get("/admin/stats", protect, authorizeRoles("admin"), getAdminStats);
-router.get("/admin/history", protect, authorizeRoles("admin"), getAllHistory);
+router.get("/admin/stats", protect, authorizeRoles("admin", "warden", "staff"), getAdminStats);
+router.get("/admin/history", protect, authorizeRoles("admin", "warden", "staff"), getAllHistory);
 
 module.exports = router;

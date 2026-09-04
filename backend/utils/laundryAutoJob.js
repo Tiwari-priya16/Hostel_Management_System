@@ -49,8 +49,22 @@ const runLaundryAutomation = async () => {
       booking.completedAt = new Date();
       await booking.save();
 
-      // Update Machine status to FREE
-      await WashingMachine.findByIdAndUpdate(booking.machine, { status: "FREE" });
+      // Check if there is another active/upcoming booking
+      const otherActive = await LaundryBooking.findOne({
+        machine: booking.machine,
+        status: { $in: ["BOOKED", "ACTIVE"] },
+        _id: { $ne: booking._id },
+        $or: [
+          { date: { $gt: todayDate } },
+          { date: todayDate, endTime: { $gt: currentTime } }
+        ]
+      });
+
+      const machine = await WashingMachine.findById(booking.machine);
+      if (machine && machine.status !== "UNDER_SERVICE" && machine.status !== "OUT_OF_SERVICE" && !otherActive) {
+        machine.status = "FREE";
+        await machine.save();
+      }
 
       // Notify Student
       createNotification(booking.student, null, `Your laundry slot is complete. Please collect your clothes.`, "laundry");

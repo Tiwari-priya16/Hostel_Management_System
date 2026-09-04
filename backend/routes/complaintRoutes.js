@@ -33,21 +33,21 @@ router.get(
 router.get(
   "/analytics",
   protect,
-  authorizeRoles("admin"),
+  authorizeRoles("admin", "warden", "staff"),
   getComplaintAnalytics
 );
 
 router.get(
   "/",
   protect,
-  authorizeRoles("admin"),
+  authorizeRoles("admin", "warden", "staff"),
   getAllComplaints
 );
 
 router.put(
   "/:id/status",
   protect,
-  authorizeRoles("admin", "staff"),
+  authorizeRoles("admin", "warden", "staff"),
   validateComplaintStatus,
   updateComplaintStatus
 );

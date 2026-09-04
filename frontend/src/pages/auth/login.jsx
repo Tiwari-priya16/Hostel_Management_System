@@ -3,14 +3,14 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { loginUser } from "../../services/authService";
 import logo from "../../assets/hostelsync-logo.png";
+import "./auth.css";
 
 function Login() {
-
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("student");
+  const [selectedRoleTab, setSelectedRoleTab] = useState("student"); // student or admin_warden
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
@@ -28,18 +28,17 @@ function Login() {
         password,
       });
 
-      // Role check: If user selected 'admin' but the account is 'student', or vice versa
       const userRole = res.data.user.role;
 
-      // Basic role verification
-      if (role === "admin" && userRole !== "admin") {
-         toast.error("Access Denied: You are not an Admin");
-         setLoading(false);
-         return;
+      // Role verification
+      if (selectedRoleTab === "admin_warden" && userRole === "student") {
+        toast.error("Access Denied: Student accounts must use Student Login");
+        setLoading(false);
+        return;
       }
 
-      if (role === "student" && userRole === "admin") {
-        toast.error("Admin accounts must use Admin login");
+      if (selectedRoleTab === "student" && userRole !== "student") {
+        toast.error("Staff & Admin accounts must use Admin / Warden Login");
         setLoading(false);
         return;
       }
@@ -53,12 +52,12 @@ function Login() {
       setTimeout(() => {
         if (userRole === "admin") {
           navigate("/dashboard/admin");
-        } else if (userRole === "staff") {
+        } else if (userRole === "warden" || userRole === "staff") {
           navigate("/dashboard/staff");
         } else {
           navigate("/dashboard/student");
         }
-      }, 1500);
+      }, 1200);
 
     } catch (error) {
       toast.error(
@@ -69,84 +68,76 @@ function Login() {
     }
   };
 
- return (
-  <div className="auth-container">
-    <div className="auth-orb auth-orb-one"></div>
-    <div className="auth-orb auth-orb-two"></div>
-    <div className="auth-card">
-      <img
-        src={logo}
-        alt="HostelSync"
-        className="auth-logo"
-      />
-
-      <h2>Welcome Back</h2>
-      <p>Login to continue</p>
-
-      {/* Role Selection Tabs */}
-      <div className="role-selector">
-        <div
-          className={`role-tab ${role === 'student' ? 'active' : ''}`}
-          onClick={() => setRole('student')}
-        >
-          Student
-        </div>
-        <div
-          className={`role-tab ${role === 'admin' ? 'active' : ''}`}
-          onClick={() => setRole('admin')}
-        >
-          Admin
-        </div>
-      </div>
-
-      <form onSubmit={handleSubmit}>
-        <input
-          type="email"
-          placeholder="Email Address"
-          value={email}
-          onChange={(e) =>
-            setEmail(e.target.value)
-          }
-          required
+  return (
+    <div className="auth-container">
+      <div className="auth-orb auth-orb-one"></div>
+      <div className="auth-orb auth-orb-two"></div>
+      <div className="auth-card">
+        <img
+          src={logo}
+          alt="HostelSync"
+          className="auth-logo"
         />
 
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) =>
-            setPassword(e.target.value)
-          }
-          required
-        />
+        <h2>Welcome Back</h2>
+        <p>Login to continue</p>
 
-        <div className="forgot-password-link" style={{ textAlign: 'right', margin: '5px 0 15px' }}>
-          <span
-            onClick={() => navigate("/forgot-password")}
-            style={{ color: '#2563eb', cursor: 'pointer', fontSize: '13px', fontWeight: '500' }}
+        {/* Role Selection Tabs */}
+        <div className="role-selector">
+          <div
+            className={`role-tab ${selectedRoleTab === 'student' ? 'active' : ''}`}
+            onClick={() => setSelectedRoleTab('student')}
           >
-            Forgot Password?
-          </span>
+            Student
+          </div>
+          <div
+            className={`role-tab ${selectedRoleTab === 'admin_warden' ? 'active' : ''}`}
+            onClick={() => setSelectedRoleTab('admin_warden')}
+          >
+            Admin / Warden
+          </div>
         </div>
 
-        <button type="submit" disabled={loading}>
-          {loading ? "Logging in..." : "Login"}
-        </button>
-      </form>
+        <form onSubmit={handleSubmit}>
+          <input
+            type="email"
+            placeholder="Email Address"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
 
-      <p className="auth-link">
-        Don't have an account?
-        <span
-          onClick={() =>
-            navigate("/register")
-          }
-        >
-          Register
-        </span>
-      </p>
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+
+          <div className="forgot-password-link" style={{ textAlign: 'right', margin: '5px 0 15px' }}>
+            <span
+              onClick={() => navigate("/forgot-password")}
+              style={{ color: '#2563eb', cursor: 'pointer', fontSize: '13px', fontWeight: '500' }}
+            >
+              Forgot Password?
+            </span>
+          </div>
+
+          <button type="submit" disabled={loading}>
+            {loading ? "Logging in..." : "Login"}
+          </button>
+        </form>
+
+        <p className="auth-link">
+          Don't have an account?
+          <span onClick={() => navigate("/register")}>
+            Register
+          </span>
+        </p>
+      </div>
     </div>
-  </div>
-);
+  );
 }
 
 export default Login;

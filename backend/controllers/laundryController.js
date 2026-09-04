@@ -8,7 +8,31 @@ const { createNotification, notifyAdmins } = require("../utils/notificationHelpe
 
 const getMachines = async (req, res) => {
   try {
+    const now = new Date();
+    const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    const todayDate = now.toISOString().split('T')[0];
+
     const machines = await WashingMachine.find();
+
+    // Auto-sync machine status based on current active/upcoming bookings
+    for (let machine of machines) {
+      if (machine.status === "BOOKED" || machine.status === "IN_USE") {
+        const activeBooking = await LaundryBooking.findOne({
+          machine: machine._id,
+          status: { $in: ["BOOKED", "ACTIVE"] },
+          $or: [
+            { date: { $gt: todayDate } },
+            { date: todayDate, endTime: { $gt: currentTime } }
+          ]
+        });
+
+        if (!activeBooking) {
+          machine.status = "FREE";
+          await machine.save();
+        }
+      }
+    }
+
     res.json({ success: true, machines });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -119,13 +143,34 @@ const cancelBooking = async (req, res) => {
     if (!booking) return res.status(404).json({ success: false, message: "Booking not found" });
 
     // Check ownership
-    if (booking.student.toString() !== req.user._id.toString() && req.user.role !== "admin") {
+    if (booking.student.toString() !== req.user._id.toString() && req.user.role !== "admin" && req.user.role !== "warden" && req.user.role !== "staff") {
       return res.status(403).json({ success: false, message: "Unauthorized" });
     }
 
     booking.status = "CANCELLED";
     booking.cancelledAt = new Date();
     await booking.save();
+
+    // Reset machine status to FREE if no other active booking exists
+    const now = new Date();
+    const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    const todayDate = now.toISOString().split('T')[0];
+
+    const otherActive = await LaundryBooking.findOne({
+      machine: booking.machine,
+      status: { $in: ["BOOKED", "ACTIVE"] },
+      _id: { $ne: booking._id },
+      $or: [
+        { date: { $gt: todayDate } },
+        { date: todayDate, endTime: { $gt: currentTime } }
+      ]
+    });
+
+    const machine = await WashingMachine.findById(booking.machine);
+    if (machine && machine.status !== "UNDER_SERVICE" && machine.status !== "OUT_OF_SERVICE" && !otherActive) {
+      machine.status = "FREE";
+      await machine.save();
+    }
 
     res.json({ success: true, message: "Booking cancelled successfully" });
   } catch (error) {

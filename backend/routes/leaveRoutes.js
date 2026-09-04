@@ -35,32 +35,32 @@ router.get(
   getMyLeaves
 );
 
-// Admin
+// Admin / Warden / Staff Operations
 router.get(
   "/",
   protect,
-  authorizeRoles("admin"),
+  authorizeRoles("admin", "warden", "staff"),
   getAllLeaves
 );
 
 router.put(
   "/:id/approve",
   protect,
-  authorizeRoles("admin"),
+  authorizeRoles("admin", "warden", "staff"),
   approveLeave
 );
 
 router.put(
   "/:id/reject",
   protect,
-  authorizeRoles("admin"),
+  authorizeRoles("admin", "warden", "staff"),
   rejectLeave
 );
 
 router.get(
   "/analytics",
   protect,
-  authorizeRoles("admin"),
+  authorizeRoles("admin", "warden", "staff"),
   getLeaveAnalytics
 );
 
