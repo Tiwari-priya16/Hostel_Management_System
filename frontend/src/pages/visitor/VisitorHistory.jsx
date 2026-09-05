@@ -47,60 +47,62 @@ function VisitorHistory() {
         {visitors.length === 0 ? (
           <p>No visitor requests found.</p>
         ) : (
-          <table className="leave-table">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Phone</th>
-                <th>Relation</th>
-                <th>Date</th>
-                <th>Status</th>
-              </tr>
-            </thead>
+          <div className="table-responsive">
+            <table className="leave-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Phone</th>
+                  <th>Relation</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
 
-            <tbody>
-              {visitors.map(
-                (visitor) => (
-                  <tr key={visitor._id}>
-                    <td>
-                      {
-                        visitor.visitorName
-                      }
-                    </td>
+              <tbody>
+                {visitors.map(
+                  (visitor) => (
+                    <tr key={visitor._id}>
+                      <td>
+                        {
+                          visitor.visitorName
+                        }
+                      </td>
 
-                    <td>
-                      {
-                        visitor.phone
-                      }
-                    </td>
+                      <td>
+                        {
+                          visitor.phone
+                        }
+                      </td>
 
-                    <td>
-                      {
-                        visitor.relation
-                      }
-                    </td>
+                      <td>
+                        {
+                          visitor.relation
+                        }
+                      </td>
 
-                    <td>
-                      {new Date(
-                        visitor.visitDate
-                      ).toLocaleDateString(
-                        "en-IN"
-                      )}
-                    </td>
+                      <td>
+                        {new Date(
+                          visitor.visitDate
+                        ).toLocaleDateString(
+                          "en-IN"
+                        )}
+                      </td>
 
-                    <td>
-                      <span
-                        className={`status ${visitor.status.toLowerCase()}`}
-                      >
-                        {visitor.status}
-                      </span>
-                    </td>
+                      <td>
+                        <span
+                          className={`status ${visitor.status.toLowerCase()}`}
+                        >
+                          {visitor.status}
+                        </span>
+                      </td>
 
-                  </tr>
-                )
-              )}
-            </tbody>
-          </table>
+                    </tr>
+                  )
+                )}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </div>

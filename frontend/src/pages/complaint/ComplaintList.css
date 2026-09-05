@@ -2,17 +2,33 @@
   background: var(--bg-secondary);
   color: var(--text-primary);
   padding: 25px;
-  border-radius: 15px;
+  border-radius: 20px;
   margin-top: 20px;
   box-shadow: var(--nav-shadow);
   border: 1px solid var(--border-color);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-top: 15px;
 }
 
 .complaint-table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 20px;
   color: var(--text-primary);
+  min-width: 600px;
+}
+
+@media (max-width: 768px) {
+  .complaint-list-container {
+    padding: 15px;
+    border-radius: 16px;
+  }
 }
 
 .complaint-table th,

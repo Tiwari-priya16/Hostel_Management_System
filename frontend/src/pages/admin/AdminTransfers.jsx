@@ -61,77 +61,79 @@ function AdminTransfers() {
         <div className="complaint-list-container">
           <h1>Room Transfer Requests</h1>
 
-          <table className="complaint-table">
-            <thead>
-              <tr>
-                <th>Student</th>
-                <th>Current Room</th>
-                <th>Requested Room</th>
-                <th>Reason</th>
-                <th>Status</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {transfers.map((transfer) => (
-                <tr key={transfer._id}>
-                  <td>
-                    <strong>
-                      {transfer.student?.name}
-                    </strong>
-                    <br />
-                    {transfer.student?.email}
-                  </td>
-
-                  <td>{transfer.currentRoom}</td>
-
-                  <td>{transfer.requestedRoom}</td>
-
-                  <td>{transfer.reason}</td>
-
-                  <td>
-                    <span
-                      className={`status ${transfer.status?.toLowerCase()}`}
-                    >
-                      {transfer.status}
-                    </span>
-                  </td>
-
-                  <td>
-                    {transfer.status === "Pending" ? (
-                      <>
-                        <button
-                          onClick={() =>
-                            handleApprove(
-                              transfer._id
-                            )
-                          }
-                          style={{
-                            marginRight: "10px",
-                          }}
-                        >
-                          Approve
-                        </button>
-
-                        <button
-                          onClick={() =>
-                            handleReject(
-                              transfer._id
-                            )
-                          }
-                        >
-                          Reject
-                        </button>
-                      </>
-                    ) : (
-                      "-"
-                    )}
-                  </td>
+          <div className="table-responsive">
+            <table className="complaint-table">
+              <thead>
+                <tr>
+                  <th>Student</th>
+                  <th>Current Room</th>
+                  <th>Requested Room</th>
+                  <th>Reason</th>
+                  <th>Status</th>
+                  <th>Action</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+
+              <tbody>
+                {transfers.map((transfer) => (
+                  <tr key={transfer._id}>
+                    <td>
+                      <strong>
+                        {transfer.student?.name}
+                      </strong>
+                      <br />
+                      {transfer.student?.email}
+                    </td>
+
+                    <td>{transfer.currentRoom}</td>
+
+                    <td>{transfer.requestedRoom}</td>
+
+                    <td>{transfer.reason}</td>
+
+                    <td>
+                      <span
+                        className={`status ${transfer.status?.toLowerCase()}`}
+                      >
+                        {transfer.status}
+                      </span>
+                    </td>
+
+                    <td>
+                      {transfer.status === "Pending" ? (
+                        <>
+                          <button
+                            onClick={() =>
+                              handleApprove(
+                                transfer._id
+                              )
+                            }
+                            style={{
+                              marginRight: "10px",
+                            }}
+                          >
+                            Approve
+                          </button>
+
+                          <button
+                            onClick={() =>
+                              handleReject(
+                                transfer._id
+                              )
+                            }
+                          >
+                            Reject
+                          </button>
+                        </>
+                      ) : (
+                        "-"
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
 
           {transfers.length === 0 && (
             <p>

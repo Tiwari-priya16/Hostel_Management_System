@@ -69,127 +69,129 @@ function AdminVisitors() {
         <div className="complaint-list-container">
           <h1>Manage Visitors</h1>
 
-          <table className="complaint-table">
-            <thead>
-              <tr>
-                <th>Student</th>
-                <th>Visitor</th>
-                <th>Phone</th>
-                <th>Relation</th>
-                <th>Date</th>
-                <th>Status</th>
-                <th>Action</th>
-              </tr>
-            </thead>
+          <div className="table-responsive">
+            <table className="complaint-table" style={{ minWidth: "700px" }}>
+              <thead>
+                <tr>
+                  <th>Student</th>
+                  <th>Visitor</th>
+                  <th>Phone</th>
+                  <th>Relation</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
 
-            <tbody>
-              {visitors.map(
-                (item) => (
-                  <tr key={item._id}>
-                    <td>
-                      <div>
-                        <strong>
-                          {
-                            item.student
-                              ?.name
-                          }
-                        </strong>
+              <tbody>
+                {visitors.map(
+                  (item) => (
+                    <tr key={item._id}>
+                      <td>
+                        <div>
+                          <strong>
+                            {
+                              item.student
+                                ?.name
+                            }
+                          </strong>
 
-                        <br />
+                          <br />
 
-                        <small>
-                          {
-                            item.student
-                              ?.email
-                          }
-                        </small>
+                          <small>
+                            {
+                              item.student
+                                ?.email
+                            }
+                          </small>
 
-                        <br />
+                          <br />
 
-                        <small>
-                          Room:{" "}
-                          {item
-                            .student
-                            ?.roomNumber ||
-                            "N/A"}
-                        </small>
-                      </div>
-                    </td>
+                          <small>
+                            Room:{" "}
+                            {item
+                              .student
+                              ?.roomNumber ||
+                              "N/A"}
+                          </small>
+                        </div>
+                      </td>
 
-                    <td>
-                      {
-                        item.visitorName
-                      }
-                    </td>
-
-                    <td>
-                      {item.phone}
-                    </td>
-
-                    <td>
-                      {
-                        item.relation
-                      }
-                    </td>
-
-                    <td>
-                      {new Date(
-                        item.visitDate
-                      ).toLocaleDateString(
-                        "en-IN"
-                      )}
-                    </td>
-
-                    <td>
-                      <span
-                        className={`status ${item.status
-                          .replace(
-                            /\s/g,
-                            ""
-                          )
-                          .toLowerCase()}`}
-                      >
+                      <td>
                         {
-                          item.status
+                          item.visitorName
                         }
-                      </span>
-                    </td>
+                      </td>
 
-                    <td>
-                      {item.status ===
-                      "Pending" ? (
-                        <>
-                          <button
-                            className="approve-btn"
-                            onClick={() =>
-                              handleApprove(
-                                item._id
-                              )
-                            }
-                          >
-                            Approve
-                          </button>
+                      <td>
+                        {item.phone}
+                      </td>
 
-                          <button
-                            className="reject-btn"
-                            onClick={() =>
-                              handleReject(
-                                item._id
-                              )
-                            }
-                          >
-                            Reject
-                          </button>
-                        </>
-                      ) : (
-                        "Action Taken"
-                      )}
-                    </td>
-                  </tr>
-                )
-              )}
-            </tbody>
-          </table>
+                      <td>
+                        {
+                          item.relation
+                        }
+                      </td>
+
+                      <td>
+                        {new Date(
+                          item.visitDate
+                        ).toLocaleDateString(
+                          "en-IN"
+                        )}
+                      </td>
+
+                      <td>
+                        <span
+                          className={`status ${item.status
+                            .replace(
+                              /\s/g,
+                              ""
+                            )
+                            .toLowerCase()}`}
+                        >
+                          {
+                            item.status
+                          }
+                        </span>
+                      </td>
+
+                      <td>
+                        {item.status ===
+                        "Pending" ? (
+                          <>
+                            <button
+                              className="approve-btn"
+                              onClick={() =>
+                                handleApprove(
+                                  item._id
+                                )
+                              }
+                            >
+                              Approve
+                            </button>
+
+                            <button
+                              className="reject-btn"
+                              onClick={() =>
+                                handleReject(
+                                  item._id
+                                )
+                              }
+                            >
+                              Reject
+                            </button>
+                          </>
+                        ) : (
+                          "Action Taken"
+                        )}
+                      </td>
+                    </tr>
+                  )
+                )}
+              </tbody>
+            </table>
+          </div>
 
           {visitors.length ===
             0 && (

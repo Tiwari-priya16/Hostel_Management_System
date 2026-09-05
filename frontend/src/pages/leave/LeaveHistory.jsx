@@ -38,58 +38,60 @@ function LeaveHistory() {
           {leaves.length === 0 ? (
             <p>No leave requests found.</p>
           ) : (
-            <table className="leave-table">
-              <thead>
-                <tr>
-                  <th>Reason</th>
-                  <th>From Date</th>
-                  <th>To Date</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {leaves.map((item) => (
-                  <tr key={item._id}>
-                    <td>{item.reason}</td>
-
-                    <td>
-                      {new Date(
-                        item.fromDate
-                      ).toLocaleDateString(
-                        "en-IN",
-                        {
-                          day: "numeric",
-                          month: "short",
-                          year: "numeric",
-                        }
-                      )}
-                    </td>
-
-                    <td>
-                      {new Date(
-                        item.toDate
-                      ).toLocaleDateString(
-                        "en-IN",
-                        {
-                          day: "numeric",
-                          month: "short",
-                          year: "numeric",
-                        }
-                      )}
-                    </td>
-
-                    <td>
-                      <span
-                        className={`status ${item.status.toLowerCase()}`}
-                      >
-                        {item.status}
-                      </span>
-                    </td>
+            <div className="table-responsive">
+              <table className="leave-table">
+                <thead>
+                  <tr>
+                    <th>Reason</th>
+                    <th>From Date</th>
+                    <th>To Date</th>
+                    <th>Status</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+
+                <tbody>
+                  {leaves.map((item) => (
+                    <tr key={item._id}>
+                      <td>{item.reason}</td>
+
+                      <td>
+                        {new Date(
+                          item.fromDate
+                        ).toLocaleDateString(
+                          "en-IN",
+                          {
+                            day: "numeric",
+                            month: "short",
+                            year: "numeric",
+                          }
+                        )}
+                      </td>
+
+                      <td>
+                        {new Date(
+                          item.toDate
+                        ).toLocaleDateString(
+                          "en-IN",
+                          {
+                            day: "numeric",
+                            month: "short",
+                            year: "numeric",
+                          }
+                        )}
+                      </td>
+
+                      <td>
+                        <span
+                          className={`status ${item.status.toLowerCase()}`}
+                        >
+                          {item.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
       </div>

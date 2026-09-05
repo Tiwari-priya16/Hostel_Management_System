@@ -17,21 +17,21 @@ router.get("/my", protect, getMyVisitors);
 router.get(
   "/",
   protect,
-  authorizeRoles("admin"),
+  authorizeRoles("admin", "warden", "staff"),
   getAllVisitors
 );
 
 router.put(
   "/:id/approve",
   protect,
-  authorizeRoles("admin"),
+  authorizeRoles("admin", "warden", "staff"),
   approveVisitor
 );
 
 router.put(
   "/:id/reject",
   protect,
-  authorizeRoles("admin"),
+  authorizeRoles("admin", "warden", "staff"),
   rejectVisitor
 );
 

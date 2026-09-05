@@ -47,50 +47,52 @@ function TransferHistory() {
         {transfers.length === 0 ? (
           <p>No requests found.</p>
         ) : (
-          <table className="leave-table">
-            <thead>
-              <tr>
-                <th>Current Room</th>
-                <th>Requested Room</th>
-                <th>Reason</th>
-                <th>Status</th>
-              </tr>
-            </thead>
+          <div className="table-responsive">
+            <table className="leave-table">
+              <thead>
+                <tr>
+                  <th>Current Room</th>
+                  <th>Requested Room</th>
+                  <th>Reason</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
 
-            <tbody>
-              {transfers.map(
-                (transfer) => (
-                  <tr
-                    key={transfer._id}
-                  >
-                    <td>
-                      {
-                        transfer.currentRoom
-                      }
-                    </td>
+              <tbody>
+                {transfers.map(
+                  (transfer) => (
+                    <tr
+                      key={transfer._id}
+                    >
+                      <td>
+                        {
+                          transfer.currentRoom
+                        }
+                      </td>
 
-                    <td>
-                      {
-                        transfer.requestedRoom
-                      }
-                    </td>
+                      <td>
+                        {
+                          transfer.requestedRoom
+                        }
+                      </td>
 
-                    <td>
-                      {transfer.reason}
-                    </td>
+                      <td>
+                        {transfer.reason}
+                      </td>
 
-                    <td>
-                      <span
-                        className={`status ${transfer.status.toLowerCase()}`}
-                      >
-                        {transfer.status}
-                      </span>
-                    </td>
-                  </tr>
-                )
-              )}
-            </tbody>
-          </table>
+                      <td>
+                        <span
+                          className={`status ${transfer.status.toLowerCase()}`}
+                        >
+                          {transfer.status}
+                        </span>
+                      </td>
+                    </tr>
+                  )
+                )}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </div>

@@ -1,11 +1,11 @@
 import React, { useContext, useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ThemeContext } from "../../context/ThemeContext";
-import { FaSun, FaMoon, FaBell, FaUserCircle, FaArrowLeft } from "react-icons/fa";
+import { FaSun, FaMoon, FaBell, FaUserCircle, FaArrowLeft, FaBars } from "react-icons/fa";
 import { getNotifications, markAsRead, markAllAsRead } from "../../services/notificationService";
 import { toast } from "react-toastify";
 import "./Navbar.css";
-import logo from "../../assets/hostelsync-logo.png";
+import hLogo from "../../assets/h-icon.png";
 
 function Navbar() {
   const { theme, toggleTheme } = useContext(ThemeContext);
@@ -61,6 +61,8 @@ function Navbar() {
     const titles = {
       "/dashboard/admin": "Admin Dashboard",
       "/dashboard/student": "Student Dashboard",
+      "/dashboard/staff": "Warden Operations",
+      "/dashboard/warden": "Warden Operations",
       "/admin/users": "Users Management",
       "/admin/users/students": "Student Details",
       "/admin/users/staff": "Staff Details",
@@ -68,6 +70,8 @@ function Navbar() {
       "/admin/complaints": "Manage Complaints",
       "/admin/leaves": "Manage Leaves",
       "/admin/visitors": "Manage Visitors",
+      "/admin/gate": "Gate Tracking",
+      "/admin/laundry": "Laundry Management",
       "/admin/feedback": "Manage Feedback",
       "/admin/notices": "Manage Notices",
       "/admin/transfers": "Room Transfers",
@@ -85,10 +89,11 @@ function Navbar() {
       "/room-transfer": "Room Transfer Request",
       "/room-transfer/history": "Transfer History",
       "/notices": "Notice Board",
+      "/gate": "Entry / Exit Pass",
       "/community": "Community Hub",
       "/profile": "My Profile",
     };
-    return titles[path] || "HostelSync";
+    return titles[path] || "";
   };
 
   const isDashboard = location.pathname.includes("/dashboard");
@@ -108,20 +113,35 @@ function Navbar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const triggerToggleSidebar = () => {
+    window.dispatchEvent(new CustomEvent("toggle-sidebar"));
+  };
+
   return (
     <div className="navbar">
       <div className="navbar-left">
-        <img src={logo} alt="HostelSync" className="navbar-logo" />
+        <button className="hamburger-btn" onClick={triggerToggleSidebar} title="Open Menu">
+          <FaBars />
+        </button>
 
-        <div className="nav-divider"></div>
+        <div className="navbar-brand" onClick={() => navigate(`/dashboard/${user?.role || "student"}`)} style={{ cursor: "pointer" }}>
+          <img src={hLogo} alt="HostelSync" className="navbar-brand-logo" />
+          <span className="navbar-brand-text">HostelSync</span>
+        </div>
 
-        {!isDashboard && (
-          <button className="back-btn" onClick={() => navigate(-1)} title="Go Back">
-            <FaArrowLeft />
-          </button>
+        {pageTitle && pageTitle !== "HostelSync" && (
+          <>
+            <div className="nav-divider"></div>
+
+            {!isDashboard && (
+              <button className="back-btn" onClick={() => navigate(-1)} title="Go Back">
+                <FaArrowLeft />
+              </button>
+            )}
+
+            <h2 className="current-page-title">{pageTitle}</h2>
+          </>
         )}
-
-        <h2 className="current-page-title">{pageTitle}</h2>
       </div>
 
       <div className="navbar-right">

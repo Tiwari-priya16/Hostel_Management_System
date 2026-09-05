@@ -10,6 +10,16 @@
   margin-left: 250px; /* Account for fixed sidebar */
   padding: 30px 40px;
   overflow-y: auto;
+  width: calc(100% - 250px);
+  box-sizing: border-box;
+}
+
+@media (max-width: 992px) {
+  .main-content {
+    margin-left: 0;
+    width: 100%;
+    padding: 18px 20px;
+  }
 }
 
 /* Dashboard Title */

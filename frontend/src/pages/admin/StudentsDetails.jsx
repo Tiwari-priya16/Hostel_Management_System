@@ -45,50 +45,52 @@ function StudentsDetails() {
             Students Details
           </h1>
 
-          <table className="complaint-table">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Phone</th>
-                <th>Room</th>
-                <th>Block</th>
-              </tr>
-            </thead>
+          <div className="table-responsive">
+            <table className="complaint-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>Room</th>
+                  <th>Block</th>
+                </tr>
+              </thead>
 
-            <tbody>
-              {students.map(
-                (student) => (
-                  <tr
-                    key={student._id}
-                  >
-                    <td>
-                      {student.name}
-                    </td>
+              <tbody>
+                {students.map(
+                  (student) => (
+                    <tr
+                      key={student._id}
+                    >
+                      <td>
+                        {student.name}
+                      </td>
 
-                    <td>
-                      {student.email}
-                    </td>
+                      <td>
+                        {student.email}
+                      </td>
 
-                    <td>
-                      {student.phone ||
-                        "N/A"}
-                    </td>
+                      <td>
+                        {student.phone ||
+                          "N/A"}
+                      </td>
 
-                    <td>
-                      {student.roomNumber ||
-                        "N/A"}
-                    </td>
+                      <td>
+                        {student.roomNumber ||
+                          "N/A"}
+                      </td>
 
-                    <td>
-                      {student.hostelBlock ||
-                        "N/A"}
-                    </td>
-                  </tr>
-                )
-              )}
-            </tbody>
-          </table>
+                      <td>
+                        {student.hostelBlock ||
+                          "N/A"}
+                      </td>
+                    </tr>
+                  )
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>

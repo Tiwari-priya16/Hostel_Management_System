@@ -11,6 +11,30 @@
   left: 0;
   z-index: 1000;
   box-shadow: 4px 0 15px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mobile-close-btn {
+  display: none;
+  background: none;
+  border: none;
+  color: #ffffff;
+  font-size: 20px;
+  cursor: pointer;
+  margin-left: auto;
+  padding: 5px;
+}
+
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 1999;
+  animation: fadeIn 0.2s ease;
 }
 
 .sidebar-logo {
@@ -23,8 +47,8 @@
 }
 
 .sidebar-logo-img {
-  width: 50px;
-  height: 50px;
+  width: 45px;
+  height: 45px;
   object-fit: contain;
   flex-shrink: 0;
 }
@@ -32,10 +56,9 @@
 .sidebar-logo h2 {
   color: #ffffff;
   margin: 0;
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 800;
   letter-spacing: -0.5px;
-  overflow: visible;
 }
 
 .sidebar a {
@@ -58,9 +81,10 @@
   flex-shrink: 0;
 }
 
-.sidebar a:hover {
-  background: rgba(255, 255, 255, 0.05);
+.sidebar a:hover, .sidebar a.active-link {
+  background: rgba(37, 99, 235, 0.25);
   color: #ffffff;
+  border-left: 4px solid #2563eb;
 }
 
 .sidebar-links {
@@ -69,17 +93,12 @@
   gap: 2px;
   overflow-y: auto;
   flex: 1;
-}
-
-/* Hide scrollbar for Chrome, Safari and Opera */
-.sidebar-links::-webkit-scrollbar {
-  display: none;
-}
-
-/* Hide scrollbar for IE, Edge and Firefox */
-.sidebar-links {
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
+}
+
+.sidebar-links::-webkit-scrollbar {
+  display: none;
 }
 
 .logout-btn {
@@ -102,4 +121,26 @@
 .logout-btn:hover {
   background: #ef4444;
   color: white;
+}
+
+/* =========================================
+   Mobile & Tablet Drawer Behavior (<= 992px)
+   ========================================= */
+@media (max-width: 992px) {
+  .sidebar {
+    width: 270px;
+    transform: translateX(-100%);
+    z-index: 2000;
+    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5);
+  }
+
+  .sidebar.mobile-open {
+    transform: translateX(0);
+  }
+
+  .mobile-close-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 }

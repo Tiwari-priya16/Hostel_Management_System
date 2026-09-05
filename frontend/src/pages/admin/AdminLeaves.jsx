@@ -60,98 +60,100 @@ function AdminLeaves() {
         <div className="complaint-list-container">
           <h1>Manage Leaves</h1>
 
-          <table className="complaint-table">
-            <thead>
-              <tr>
-                <th>Student</th>
-                <th>Reason</th>
-                <th>From</th>
-                <th>To</th>
-                <th>Status</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {leaves.map((item) => (
-                <tr key={item._id}>
-                  <td>
-                    <div>
-                      <strong>
-                        {item.student?.name}
-                      </strong>
-                      <br />
-                      <small>
-                        {item.student?.email}
-                      </small>
-                      <br />
-                      <small>
-                        Room:{" "}
-                        {item.student
-                          ?.roomNumber ||
-                          "N/A"}
-                      </small>
-                    </div>
-                  </td>
-
-                  <td>{item.reason}</td>
-
-                  <td>
-                    {new Date(
-                      item.fromDate
-                    ).toLocaleDateString()}
-                  </td>
-
-                  <td>
-                    {new Date(
-                      item.toDate
-                    ).toLocaleDateString()}
-                  </td>
-
-                  <td>
-                    <span
-                      className={`status ${item.status.toLowerCase()}`}
-                    >
-                      {item.status}
-                    </span>
-                  </td>
-
-                  <td>
-                    {item.status ===
-                    "Pending" ? (
-                      <>
-                        <button
-                          className="approve-btn"
-                          onClick={() =>
-                            handleApprove(
-                              item._id
-                            )
-                          }
-                        >
-                          Approve
-                        </button>
-
-                        <button
-                          className="reject-btn"
-                          onClick={() =>
-                            handleReject(
-                              item._id
-                            )
-                          }
-                        >
-                          Reject
-                        </button>
-                      </>
-                    ) : (
-                      <span>
-                        Action Taken
-                      </span>
-                    )}
-                  </td>
+          <div className="table-responsive">
+            <table className="complaint-table">
+              <thead>
+                <tr>
+                  <th>Student</th>
+                  <th>Reason</th>
+                  <th>From</th>
+                  <th>To</th>
+                  <th>Status</th>
+                  <th>Action</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+
+              <tbody>
+                {leaves.map((item) => (
+                  <tr key={item._id}>
+                    <td>
+                      <div>
+                        <strong>
+                          {item.student?.name}
+                        </strong>
+                        <br />
+                        <small>
+                          {item.student?.email}
+                        </small>
+                        <br />
+                        <small>
+                          Room:{" "}
+                          {item.student
+                            ?.roomNumber ||
+                            "N/A"}
+                        </small>
+                      </div>
+                    </td>
+
+                    <td>{item.reason}</td>
+
+                    <td>
+                      {new Date(
+                        item.fromDate
+                      ).toLocaleDateString()}
+                    </td>
+
+                    <td>
+                      {new Date(
+                        item.toDate
+                      ).toLocaleDateString()}
+                    </td>
+
+                    <td>
+                      <span
+                        className={`status ${item.status.toLowerCase()}`}
+                      >
+                        {item.status}
+                      </span>
+                    </td>
+
+                    <td>
+                      {item.status ===
+                      "Pending" ? (
+                        <>
+                          <button
+                            className="approve-btn"
+                            onClick={() =>
+                              handleApprove(
+                                item._id
+                              )
+                            }
+                          >
+                            Approve
+                          </button>
+
+                          <button
+                            className="reject-btn"
+                            onClick={() =>
+                              handleReject(
+                                item._id
+                              )
+                            }
+                          >
+                            Reject
+                          </button>
+                        </>
+                      ) : (
+                        <span>
+                          Action Taken
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
 
           {leaves.length === 0 && (
             <p>No leave requests found.</p>

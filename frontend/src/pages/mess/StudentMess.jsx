@@ -48,7 +48,7 @@ function StudentMess() {
   };
 
   const checkMessStatus = (menu = todayMenu) => {
-    if (!menu) return;
+    if (!menu || !menu.breakfast || !menu.lunch || !menu.dinner) return;
 
     const now = new Date();
     const hour = now.getHours();
@@ -63,7 +63,7 @@ function StudentMess() {
       { type: 'breakfast', name: 'Breakfast', ...menu.breakfast },
       { type: 'lunch', name: 'Lunch', ...menu.lunch },
       { type: 'dinner', name: 'Dinner', ...menu.dinner }
-    ];
+    ].filter(m => m.startTime && m.endTime);
 
     for (const meal of meals) {
       if (currentTime >= meal.startTime && currentTime <= meal.endTime) {
@@ -73,7 +73,7 @@ function StudentMess() {
       }
     }
 
-    if (!isOpen) {
+    if (!isOpen && meals.length > 0) {
       nextMeal = meals.find(m => m.startTime > currentTime) || meals[0];
     }
 
