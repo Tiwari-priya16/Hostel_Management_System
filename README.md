@@ -1,6 +1,6 @@
 # 🏨 Hostel Management System (HostelSync)
 
-A production-ready, full-stack **Hostel Management ERP System** built using the **MERN Stack** (MongoDB, Express.js, React, Node.js) with Vite. HostelSync streamlines hostel administration, automates facility reservations, and enhances communication between Students, Wardens, and Super Administrators.
+A production-ready, full-stack **Hostel Management System** built using the **MERN Stack** (MongoDB, Express.js, React, Node.js) with Vite. HostelSync streamlines hostel administration, automates facility reservations, and enhances communication between Students, Wardens, and Super Administrators.
 
 The application features a **3-Tier Role Hierarchy**, secure JWT authentication, real-time OTP email verification, Cloudinary cloud image storage, background automation, and a WhatsApp-style Community Hub.
 
