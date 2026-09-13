@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { createVisitor } from "../../services/visitorService";
 import { toast } from "react-toastify";
-import Sidebar from "../../components/sidebar/Sidebar";
+import Sidebar from "../../components/sidebar/sidebar";
 import Navbar from "../../components/navbar/Navbar";
 
 import "../dashboard/dashboard.css";

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Sidebar from "../../components/sidebar/Sidebar";
+import Sidebar from "../../components/sidebar/sidebar";
 import Navbar from "../../components/navbar/Navbar";
 import { getMyLaundryBookings, cancelLaundryBooking } from "../../services/laundryService";
 import { toast } from "react-toastify";

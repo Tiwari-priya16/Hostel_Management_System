@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Sidebar from "../../components/sidebar/Sidebar";
+import Sidebar from "../../components/sidebar/sidebar";
 import Navbar from "../../components/navbar/Navbar";
 import { getMyComplaints } from "../../services/complaintService";
 import { FaImage, FaCheckCircle, FaTimes } from "react-icons/fa";

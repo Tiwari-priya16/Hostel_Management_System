@@ -5,7 +5,7 @@ import React, {
 
 import { useNavigate } from "react-router-dom";
 
-import Sidebar from "../../components/sidebar/Sidebar";
+import Sidebar from "../../components/sidebar/sidebar";
 import Navbar from "../../components/navbar/Navbar";
 
 import {

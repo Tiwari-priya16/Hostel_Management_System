@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from "react";
-import Sidebar from "../../components/sidebar/Sidebar";
+import Sidebar from "../../components/sidebar/sidebar";
 import Navbar from "../../components/navbar/Navbar";
 import { getWeeklyMenu, submitMealRating, getTodayMessRatings } from "../../services/messService";
 import { FaUtensils, FaClock, FaStar, FaRegStar, FaChevronRight } from "react-icons/fa";
