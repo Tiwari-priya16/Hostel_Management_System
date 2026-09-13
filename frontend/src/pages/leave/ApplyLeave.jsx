@@ -1,12 +1,16 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Sidebar from "../../components/sidebar/Sidebar";
 import Navbar from "../../components/navbar/Navbar";
 import { applyLeave } from "../../services/leaveService";
+import { toast } from "react-toastify";
 
 import "../dashboard/dashboard.css";
 import "./ApplyLeave.css";
 
 function ApplyLeave() {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     reason: "",
     fromDate: "",
@@ -37,8 +41,9 @@ function ApplyLeave() {
         toDate: "",
       });
 
+      navigate("/my-leaves");
     } catch (error) {
-        toast.error(error.response?.data?.message || "Failed to apply leave");
+      toast.error(error.response?.data?.message || "Failed to apply leave");
     } finally {
       setLoading(false);
     }
@@ -87,6 +92,14 @@ function ApplyLeave() {
 
               <button type="submit" disabled={loading}>
                 {loading ? "Applying..." : "Apply Leave"}
+              </button>
+
+              <button
+                type="button"
+                style={{ marginTop: "10px" }}
+                onClick={() => navigate("/my-leaves")}
+              >
+                View My Leaves
               </button>
 
             </form>

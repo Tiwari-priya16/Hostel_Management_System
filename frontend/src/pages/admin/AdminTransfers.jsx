@@ -103,19 +103,18 @@ function AdminTransfers() {
                       {transfer.status === "Pending" ? (
                         <>
                           <button
+                            className="approve-btn"
                             onClick={() =>
                               handleApprove(
                                 transfer._id
                               )
                             }
-                            style={{
-                              marginRight: "10px",
-                            }}
                           >
                             Approve
                           </button>
 
                           <button
+                            className="reject-btn"
                             onClick={() =>
                               handleReject(
                                 transfer._id

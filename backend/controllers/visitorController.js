@@ -19,6 +19,9 @@ const createVisitor = async (req, res) => {
       student: req.user._id,
     });
 
+    // Notify Student
+    createNotification(req.user._id, null, `Your visitor request for ${visitorName} has been submitted.`, "visitor");
+
     // Notify Admins (Async)
     notifyAdmins(req.user._id, `New Visitor Request: ${visitorName} for Student ${req.user.name}`, "visitor");
 

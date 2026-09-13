@@ -12,6 +12,9 @@ exports.applyRoomTransfer = async (req, res) => {
       reason: req.body.reason,
     });
 
+    // Notify Student
+    await createNotification(req.user._id, null, `Your room transfer request to Room ${req.body.requestedRoom} has been submitted.`, "room-transfer");
+
     // Notify Admins
     await notifyAdmins(req.user._id, `New Room Transfer Request from Student ${req.user.name}`, "room-transfer");
 

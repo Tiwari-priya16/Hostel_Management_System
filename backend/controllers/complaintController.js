@@ -25,6 +25,9 @@ const createComplaint = async (req, res) => {
       raisedBy: req.user._id,
     });
 
+    // Notify Student
+    createNotification(req.user._id, null, `Your complaint '${title}' has been submitted successfully.`, "complaint");
+
     // Notify Admins (Async)
     notifyAdmins(req.user._id, `New complaint raised: ${title}`, "complaint");
 

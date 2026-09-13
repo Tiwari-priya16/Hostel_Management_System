@@ -183,7 +183,20 @@
   border-color: #2563eb;
 }
 
-.slot-btn:hover:not(.selected) {
+.slot-btn.disabled-slot {
+  opacity: 0.45;
+  background: var(--bg-surface);
+  color: var(--text-muted);
+  cursor: not-allowed;
+  border-color: var(--border-color);
+}
+
+.slot-btn.disabled-slot:hover {
+  border-color: var(--border-color);
+  color: var(--text-muted);
+}
+
+.slot-btn:hover:not(.selected):not(.disabled-slot) {
   border-color: #2563eb;
   color: #2563eb;
 }

@@ -100,38 +100,67 @@
 }
 
 .status-select {
-  padding: 8px 12px;
+  padding: 8px 14px;
   border: 1px solid var(--border-color);
-  border-radius: 8px;
-  background: var(--bg-primary);
+  border-radius: 10px;
+  background: var(--bg-surface);
   color: var(--text-primary);
   cursor: pointer;
   outline: none;
   min-width: 130px;
-  font-size: 14px;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.status-select option,
+select option {
+  background-color: var(--bg-surface) !important;
+  color: var(--text-primary) !important;
+  padding: 10px;
 }
 
 .status-select:focus {
   border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
 }
 
 .approve-btn {
-  background: #22c55e;
-  color: white;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 6px;
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 13px;
   cursor: pointer;
+  transition: all 0.2s ease;
   margin-right: 8px;
 }
 
+.approve-btn:hover {
+  background: #22c55e;
+  color: white;
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.25);
+}
+
 .reject-btn {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.reject-btn:hover {
   background: #ef4444;
   color: white;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 6px;
-  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
 }
 
 .complaint-table thead {

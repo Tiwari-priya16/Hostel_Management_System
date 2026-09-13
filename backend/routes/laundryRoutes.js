@@ -5,6 +5,7 @@ const {
   getMachines,
   addMachine,
   updateMachine,
+  getMachineBookedSlots,
   createBooking,
   getMyBookings,
   getAllBookings,
@@ -18,6 +19,7 @@ const {
 
 // Machines
 router.get("/machines", protect, getMachines);
+router.get("/machines/:machineId/slots", protect, getMachineBookedSlots);
 router.post("/machines", protect, authorizeRoles("admin"), addMachine);
 router.put("/machines/:id", protect, authorizeRoles("admin", "warden", "staff"), updateMachine);
 

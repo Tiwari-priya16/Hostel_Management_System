@@ -16,6 +16,11 @@ export const updateMachine = async (id, data) => {
   return res.data;
 };
 
+export const getMachineBookedSlots = async (machineId, date) => {
+  const res = await API.get(`/laundry/machines/${machineId}/slots`, { params: { date } });
+  return res.data;
+};
+
 // Bookings
 export const createLaundryBooking = async (data) => {
   const res = await API.post("/laundry/bookings", data);

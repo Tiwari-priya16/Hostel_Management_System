@@ -4,30 +4,50 @@ const MaintenanceRequest = require("../models/MaintenanceRequest");
 const LaundrySettings = require("../models/LaundrySettings");
 const { createNotification, notifyAdmins } = require("../utils/notificationHelper");
 
+// Helper to auto-complete expired past bookings
+const cleanupPastBookings = async () => {
+  const now = new Date();
+  const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+  const todayDate = now.toISOString().split('T')[0];
+
+  await LaundryBooking.updateMany(
+    {
+      status: { $in: ["BOOKED", "ACTIVE"] },
+      $or: [
+        { date: { $lt: todayDate } },
+        { date: todayDate, endTime: { $lte: currentTime } }
+      ]
+    },
+    { $set: { status: "COMPLETED", completedAt: now } }
+  );
+};
+
 // --- MACHINE MANAGEMENT ---
 
 const getMachines = async (req, res) => {
   try {
+    await cleanupPastBookings();
+
     const now = new Date();
     const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
     const todayDate = now.toISOString().split('T')[0];
 
     const machines = await WashingMachine.find();
 
-    // Auto-sync machine status based on current active/upcoming bookings
+    // Machine-level live status check (IN_USE only if currently running right now)
     for (let machine of machines) {
-      if (machine.status === "BOOKED" || machine.status === "IN_USE") {
-        const activeBooking = await LaundryBooking.findOne({
+      if (machine.status !== "UNDER_SERVICE" && machine.status !== "OUT_OF_SERVICE") {
+        const liveBooking = await LaundryBooking.findOne({
           machine: machine._id,
-          status: { $in: ["BOOKED", "ACTIVE"] },
-          $or: [
-            { date: { $gt: todayDate } },
-            { date: todayDate, endTime: { $gt: currentTime } }
-          ]
+          date: todayDate,
+          startTime: { $lte: currentTime },
+          endTime: { $gt: currentTime },
+          status: { $in: ["BOOKED", "ACTIVE"] }
         });
 
-        if (!activeBooking) {
-          machine.status = "FREE";
+        const newStatus = liveBooking ? "IN_USE" : "FREE";
+        if (machine.status !== newStatus) {
+          machine.status = newStatus;
           await machine.save();
         }
       }
@@ -57,38 +77,86 @@ const updateMachine = async (req, res) => {
   }
 };
 
+// Get booked slots for a specific machine and date
+const getMachineBookedSlots = async (req, res) => {
+  try {
+    await cleanupPastBookings();
+    const { machineId } = req.params;
+    const { date } = req.query;
+
+    const bookings = await LaundryBooking.find({
+      machine: machineId,
+      date: date,
+      status: { $in: ["BOOKED", "ACTIVE"] }
+    });
+
+    const bookedSlots = bookings.map(b => `${b.startTime}-${b.endTime}`);
+    res.json({ success: true, bookedSlots });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 // --- BOOKING MANAGEMENT ---
 
 const createBooking = async (req, res) => {
   try {
+    await cleanupPastBookings();
     const { machineId, date, slot } = req.body;
     const [startTime, endTime] = slot.split("-");
 
-    // 1. Validate Machine
-    const machine = await WashingMachine.findById(machineId);
-    if (!machine || machine.status === "OUT_OF_SERVICE" || machine.status === "UNDER_SERVICE") {
-      return res.status(400).json({ success: false, message: "Machine is not available for booking" });
+    const now = new Date();
+    const todayDate = now.toISOString().split('T')[0];
+    const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+    // 1. Validate Date (Only today or tomorrow within 24 hours)
+    if (date < todayDate) {
+      return res.status(400).json({ success: false, message: "Cannot book slots for past dates." });
     }
 
-    // 2. Validate Student Booking Limit
+    // 2. Validate Slot Time (If today, cannot book past hours)
+    if (date === todayDate && endTime <= currentTime) {
+      return res.status(400).json({ success: false, message: "This time slot has already passed for today." });
+    }
+
+    // 3. Validate Machine Status
+    const machine = await WashingMachine.findById(machineId);
+    if (!machine || machine.status === "OUT_OF_SERVICE" || machine.status === "UNDER_SERVICE") {
+      return res.status(400).json({ success: false, message: "Machine is under maintenance or out of service." });
+    }
+
+    // 4. Validate Student Active Booking Limit
     const settings = await LaundrySettings.findOne() || { maxActiveBookingsPerStudent: 1 };
     const activeBookings = await LaundryBooking.countDocuments({
       student: req.user._id,
-      status: { $in: ["BOOKED", "ACTIVE"] }
+      status: { $in: ["BOOKED", "ACTIVE"] },
+      $or: [
+        { date: { $gt: todayDate } },
+        { date: todayDate, endTime: { $gt: currentTime } }
+      ]
     });
     if (activeBookings >= settings.maxActiveBookingsPerStudent) {
       return res.status(400).json({ success: false, message: `You already have ${activeBookings} active/upcoming booking(s).` });
     }
 
-    // 3. Double Booking Check (using compound unique index in DB as safety, but checking here too)
-    const existing = await LaundryBooking.findOne({ machine: machineId, date, startTime });
+    // 5. Double Booking Check for specific slot
+    const existing = await LaundryBooking.findOne({
+      machine: machineId,
+      date,
+      startTime,
+      status: { $in: ["BOOKED", "ACTIVE"] }
+    });
+
     if (existing) {
-      return res.status(400).json({ success: false, message: "This slot is already booked by someone else." });
+      return res.status(400).json({ success: false, message: "This specific time slot is already booked by another student." });
     }
 
-    // 4. Create Booking
+    // 6. Create Booking
     const bookingCount = await LaundryBooking.countDocuments();
     const bookingId = `WM-${new Date().getFullYear()}-${1000 + bookingCount}`;
+
+    // Check if slot starts right now
+    const isRunningNow = (date === todayDate && startTime <= currentTime && endTime > currentTime);
 
     const booking = await LaundryBooking.create({
       bookingId,
@@ -97,13 +165,17 @@ const createBooking = async (req, res) => {
       date,
       startTime,
       endTime,
-      status: "BOOKED"
+      status: isRunningNow ? "ACTIVE" : "BOOKED",
+      startedAt: isRunningNow ? now : undefined
     });
 
-    // Update Machine status to BOOKED only if it was FREE
-    if (machine.status === "FREE") {
-      await WashingMachine.findByIdAndUpdate(machineId, { status: "BOOKED" });
+    if (isRunningNow) {
+      machine.status = "IN_USE";
+      await machine.save();
     }
+
+    // Notify Student
+    createNotification(req.user._id, null, `Your washing machine booking for Machine ${machine.machineNumber} (${slot}) is confirmed!`, "laundry");
 
     // Notify Admins
     notifyAdmins(req.user._id, `New Laundry Booking: ${bookingId} by ${req.user.name}`, "laundry");
@@ -116,9 +188,12 @@ const createBooking = async (req, res) => {
 
 const getMyBookings = async (req, res) => {
   try {
+    await cleanupPastBookings();
+
     const bookings = await LaundryBooking.find({ student: req.user._id })
       .populate("machine")
       .sort({ createdAt: -1 });
+
     res.json({ success: true, bookings });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -127,10 +202,13 @@ const getMyBookings = async (req, res) => {
 
 const getAllBookings = async (req, res) => {
   try {
+    await cleanupPastBookings();
+
     const bookings = await LaundryBooking.find()
       .populate("machine")
       .populate("student", "name email roomNumber")
       .sort({ createdAt: -1 });
+
     res.json({ success: true, bookings });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -151,24 +229,22 @@ const cancelBooking = async (req, res) => {
     booking.cancelledAt = new Date();
     await booking.save();
 
-    // Reset machine status to FREE if no other active booking exists
+    // Re-check machine live status
     const now = new Date();
     const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
     const todayDate = now.toISOString().split('T')[0];
 
-    const otherActive = await LaundryBooking.findOne({
+    const liveBooking = await LaundryBooking.findOne({
       machine: booking.machine,
-      status: { $in: ["BOOKED", "ACTIVE"] },
-      _id: { $ne: booking._id },
-      $or: [
-        { date: { $gt: todayDate } },
-        { date: todayDate, endTime: { $gt: currentTime } }
-      ]
+      date: todayDate,
+      startTime: { $lte: currentTime },
+      endTime: { $gt: currentTime },
+      status: { $in: ["BOOKED", "ACTIVE"] }
     });
 
     const machine = await WashingMachine.findById(booking.machine);
-    if (machine && machine.status !== "UNDER_SERVICE" && machine.status !== "OUT_OF_SERVICE" && !otherActive) {
-      machine.status = "FREE";
+    if (machine && machine.status !== "UNDER_SERVICE" && machine.status !== "OUT_OF_SERVICE") {
+      machine.status = liveBooking ? "IN_USE" : "FREE";
       await machine.save();
     }
 
@@ -257,6 +333,7 @@ module.exports = {
   getMachines,
   addMachine,
   updateMachine,
+  getMachineBookedSlots,
   createBooking,
   getMyBookings,
   getAllBookings,

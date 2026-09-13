@@ -21,6 +21,9 @@ exports.createLeave = async (req, res) => {
       toDate: req.body.toDate,
     });
 
+    // Notify Student
+    createNotification(req.user.id, null, "Your leave application has been submitted successfully.", "leave");
+
     // Notify Admins (Async)
     notifyAdmins(req.user.id, `New leave request from Student: ${req.user.name}`, "leave");
 
