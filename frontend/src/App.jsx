@@ -18,8 +18,8 @@ import Laundry from "./pages/laundry/Laundry";
 import BookingHistory from "./pages/laundry/BookingHistory";
 import AddVisitor from "./pages/visitor/AddVisitor";
 import VisitorHistory from "./pages/visitor/VisitorHistory";
-import RequestTransfer from "./pages/roomTransfer/RequestTransfer";
-import TransferHistory from "./pages/roomTransfer/TransferHistory";
+import RequestTransfer from "./pages/roomtransfer/RequestTransfer";
+import TransferHistory from "./pages/roomtransfer/TransferHistory";
 import NoticeList from "./pages/notice/NoticeList";
 
 
