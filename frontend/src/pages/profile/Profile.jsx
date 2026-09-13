@@ -303,7 +303,14 @@ function Profile() {
               {user?.role === "student" && (
                 <div className="stat-item">
                   <span>Current Floor</span>
-                  <strong>{user?.roomNumber?.charAt(0) || "1"}st Floor</strong>
+                  <strong>
+                    {(() => {
+                      const floor = user?.roomNumber?.charAt(0) || "1";
+                      if (floor === "0") return "Ground Floor";
+                      const suffix = floor === "1" ? "st" : floor === "2" ? "nd" : floor === "3" ? "rd" : "th";
+                      return `${floor}${suffix} Floor`;
+                    })()}
+                  </strong>
                 </div>
               )}
             </div>
