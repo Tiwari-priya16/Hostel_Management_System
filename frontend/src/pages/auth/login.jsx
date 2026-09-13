@@ -60,9 +60,10 @@ function Login() {
       }, 1200);
 
     } catch (error) {
-      toast.error(
-        error.response?.data?.message || "Login Failed. Please check your credentials."
-      );
+      console.error("Login Error:", error);
+      const message = error.response?.data?.message ||
+                     (error.code === 'ERR_NETWORK' ? "Network Error: Cannot connect to server. Check if backend is running." : "Login Failed. Please check your credentials.");
+      toast.error(message);
     } finally {
       setLoading(false);
     }
