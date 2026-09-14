@@ -6,8 +6,9 @@ import { compressAndResizeImage, uploadImageToCloudinary } from "../../services/
 import { toast } from "react-toastify";
 import {
   FaUser, FaPhone, FaEnvelope, FaBuilding, FaDoorOpen, FaCamera, FaPen,
-  FaImage, FaTrash, FaSpinner, FaTimes
+  FaImage, FaTrash, FaSpinner, FaTimes, FaLock
 } from "react-icons/fa";
+import ConfirmModal from "../../components/ConfirmModal";
 import "./Profile.css";
 
 function Profile() {
@@ -17,6 +18,8 @@ function Profile() {
     phone: user?.phone || "",
     roomNumber: user?.roomNumber || "",
     hostelBlock: user?.hostelBlock || "",
+    currentPassword: "",
+    newPassword: "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -24,6 +27,7 @@ function Profile() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [showPhotoOptions, setShowPhotoOptions] = useState(false);
+  const [modalConfig, setModalConfig] = useState({ isOpen: false });
 
   const galleryInputRef = useRef(null);
   const cameraInputRef = useRef(null);
@@ -74,23 +78,32 @@ function Profile() {
   };
 
   // Remove existing profile photo
-  const handleRemovePhoto = async () => {
-    if (!window.confirm("Are you sure you want to remove your profile photo?")) return;
-
-    try {
-      setUploadingPhoto(true);
-      const res = await updateUserProfile({ profilePic: "" });
-      if (res.success) {
-        localStorage.setItem("user", JSON.stringify(res.user));
-        setUser(res.user);
-        toast.success("Profile photo removed successfully!");
-        setShowPhotoOptions(false);
-      }
-    } catch (error) {
-      toast.error("Failed to remove profile photo");
-    } finally {
-      setUploadingPhoto(false);
-    }
+  const handleRemovePhoto = () => {
+    setModalConfig({
+      isOpen: true,
+      title: "Remove Photo",
+      message: "Are you sure you want to remove your profile photo?",
+      confirmText: "Remove Photo",
+      type: "danger",
+      onConfirm: async () => {
+        try {
+          setUploadingPhoto(true);
+          const res = await updateUserProfile({ profilePic: "" });
+          if (res.success) {
+            localStorage.setItem("user", JSON.stringify(res.user));
+            setUser(res.user);
+            toast.success("Profile photo removed successfully!");
+            setShowPhotoOptions(false);
+          }
+        } catch (error) {
+          toast.error("Failed to remove profile photo");
+        } finally {
+          setUploadingPhoto(false);
+        }
+        setModalConfig({ isOpen: false });
+      },
+      onCancel: () => setModalConfig({ isOpen: false })
+    });
   };
 
   const cancelPreview = () => {
@@ -108,6 +121,7 @@ function Profile() {
         localStorage.setItem("user", JSON.stringify(res.user));
         setUser(res.user);
         toast.success("Profile updated successfully");
+        setFormData(prev => ({ ...prev, currentPassword: "", newPassword: "" }));
       }
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to update profile");
@@ -275,7 +289,13 @@ function Profile() {
                   <div className="form-row">
                     <div className="form-group">
                       <label><FaBuilding /> Hostel Block</label>
-                      <input type="text" name="hostelBlock" value={formData.hostelBlock} onChange={handleChange} />
+                      <select name="hostelBlock" value={formData.hostelBlock} onChange={handleChange}>
+                        <option value="">Select Block</option>
+                        <option value="Block A">Block A</option>
+                        <option value="Block B">Block B</option>
+                        <option value="Block C">Block C</option>
+                        <option value="Block D">Block D</option>
+                      </select>
                     </div>
                     <div className="form-group">
                       <label><FaDoorOpen /> Room No.</label>
@@ -283,6 +303,32 @@ function Profile() {
                     </div>
                   </div>
                 )}
+
+                <div className="password-section" style={{ marginTop: '20px', padding: '15px', background: 'var(--bg-primary)', borderRadius: '12px' }}>
+                  <h4 style={{ margin: '0 0 15px 0', fontSize: '15px', color: 'var(--text-secondary)' }}>Change Password (Optional)</h4>
+
+                  <div className="form-group">
+                    <label><FaLock /> Current Password</label>
+                    <input
+                      type="password"
+                      name="currentPassword"
+                      placeholder="Enter current password"
+                      value={formData.currentPassword}
+                      onChange={handleChange}
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label><FaLock /> New Password</label>
+                    <input
+                      type="password"
+                      name="newPassword"
+                      placeholder="Enter new password"
+                      value={formData.newPassword}
+                      onChange={handleChange}
+                    />
+                  </div>
+                </div>
 
                 <button type="submit" className="update-profile-btn" disabled={loading}>
                   {loading ? "Updating..." : "Update Profile"}
@@ -317,6 +363,7 @@ function Profile() {
           </div>
         </div>
       </div>
+      <ConfirmModal {...modalConfig} />
     </div>
   );
 }

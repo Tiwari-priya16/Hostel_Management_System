@@ -10,6 +10,7 @@ exports.applyRoomTransfer = async (req, res) => {
       currentRoom: req.body.currentRoom,
       requestedRoom: req.body.requestedRoom,
       reason: req.body.reason,
+      hostelBlock: req.user.hostelBlock,
     });
 
     // Notify Student
@@ -56,7 +57,9 @@ exports.getMyTransfers = async (req, res) => {
 // Admin view all requests
 exports.getAllTransfers = async (req, res) => {
   try {
-    const transfers = await RoomTransfer.find()
+    const filter = req.user.role === "admin" ? {} : { hostelBlock: req.user.hostelBlock };
+
+    const transfers = await RoomTransfer.find(filter)
       .populate("student", "name email roomNumber")
       .populate("approvedBy", "name email");
 
@@ -149,17 +152,22 @@ exports.rejectTransfer = async (req, res) => {
 // Analytics
 exports.getAnalytics = async (req, res) => {
   try {
-    const total = await RoomTransfer.countDocuments();
+    const filter = req.user.role === "admin" ? {} : { hostelBlock: req.user.hostelBlock };
+
+    const total = await RoomTransfer.countDocuments(filter);
 
     const pending = await RoomTransfer.countDocuments({
+      ...filter,
       status: "Pending",
     });
 
     const approved = await RoomTransfer.countDocuments({
+      ...filter,
       status: "Approved",
     });
 
     const rejected = await RoomTransfer.countDocuments({
+      ...filter,
       status: "Rejected",
     });
 

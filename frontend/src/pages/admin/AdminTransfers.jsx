@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import Sidebar from "../../components/sidebar/sidebar";
 import Navbar from "../../components/navbar/Navbar";
 import { toast } from "react-toastify";
+import Loader from "../../components/Loader";
 
 import {
   getAllTransfers,
@@ -14,6 +15,7 @@ import "../dashboard/dashboard.css";
 
 function AdminTransfers() {
   const [transfers, setTransfers] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchTransfers();
@@ -21,11 +23,13 @@ function AdminTransfers() {
 
   const fetchTransfers = async () => {
     try {
+      setLoading(true);
       const res = await getAllTransfers();
 
       setTransfers(res.transfers || []);
     } catch (error) {
-      console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -61,84 +65,90 @@ function AdminTransfers() {
         <div className="complaint-list-container">
           <h1>Room Transfer Requests</h1>
 
-          <div className="table-responsive">
-            <table className="complaint-table">
-              <thead>
-                <tr>
-                  <th>Student</th>
-                  <th>Current Room</th>
-                  <th>Requested Room</th>
-                  <th>Reason</th>
-                  <th>Status</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
+          {loading ? (
+            <Loader />
+          ) : (
+            <>
+              <div className="table-responsive">
+                <table className="complaint-table">
+                  <thead>
+                    <tr>
+                      <th>Student</th>
+                      <th>Current Room</th>
+                      <th>Requested Room</th>
+                      <th>Reason</th>
+                      <th>Status</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
 
-              <tbody>
-                {transfers.map((transfer) => (
-                  <tr key={transfer._id}>
-                    <td>
-                      <strong>
-                        {transfer.student?.name}
-                      </strong>
-                      <br />
-                      {transfer.student?.email}
-                    </td>
+                  <tbody>
+                    {transfers.map((transfer) => (
+                      <tr key={transfer._id}>
+                        <td>
+                          <strong>
+                            {transfer.student?.name}
+                          </strong>
+                          <br />
+                          {transfer.student?.email}
+                        </td>
 
-                    <td>{transfer.currentRoom}</td>
+                        <td>{transfer.currentRoom}</td>
 
-                    <td>{transfer.requestedRoom}</td>
+                        <td>{transfer.requestedRoom}</td>
 
-                    <td>{transfer.reason}</td>
+                        <td>{transfer.reason}</td>
 
-                    <td>
-                      <span
-                        className={`status ${transfer.status?.toLowerCase()}`}
-                      >
-                        {transfer.status}
-                      </span>
-                    </td>
-
-                    <td>
-                      {transfer.status === "Pending" ? (
-                        <>
-                          <button
-                            className="approve-btn"
-                            onClick={() =>
-                              handleApprove(
-                                transfer._id
-                              )
-                            }
+                        <td>
+                          <span
+                            className={`status ${transfer.status?.toLowerCase()}`}
                           >
-                            Approve
-                          </button>
+                            {transfer.status}
+                          </span>
+                        </td>
 
-                          <button
-                            className="reject-btn"
-                            onClick={() =>
-                              handleReject(
-                                transfer._id
-                              )
-                            }
-                          >
-                            Reject
-                          </button>
-                        </>
-                      ) : (
-                        "-"
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                        <td>
+                          {transfer.status === "Pending" ? (
+                            <>
+                              <button
+                                className="approve-btn"
+                                onClick={() =>
+                                  handleApprove(
+                                    transfer._id
+                                  )
+                                }
+                              >
+                                Approve
+                              </button>
 
-          {transfers.length === 0 && (
-            <p>
-              No room transfer requests
-              found.
-            </p>
+                              <button
+                                className="reject-btn"
+                                onClick={() =>
+                                  handleReject(
+                                    transfer._id
+                                  )
+                                }
+                              >
+                                Reject
+                              </button>
+                            </>
+                          ) : (
+                            "-"
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {transfers.length === 0 && (
+                <p style={{ textAlign: 'center', marginTop: '20px' }}>
+                  No room transfer requests
+                  found.
+                </p>
+              )}
+            </>
           )}
         </div>
       </div>

@@ -10,19 +10,24 @@ import {
 import { compressAndResizeImage, uploadImageToCloudinary } from "../../services/uploadService";
 import { toast } from "react-toastify";
 import { FaImage, FaCamera, FaTimes, FaCheckCircle, FaSpinner } from "react-icons/fa";
+import ConfirmModal from "../../components/ConfirmModal";
+import Loader from "../../components/Loader";
 
 import "../complaint/ComplaintList.css";
 import "../dashboard/dashboard.css";
 
 function AdminComplaints() {
   const [complaints, setComplaints] = useState([]);
+  const user = JSON.parse(localStorage.getItem("user"));
   const [activePhotoModal, setActivePhotoModal] = useState(null); // { url, title }
 
   // Resolution Modal State
   const [resolvingComplaint, setResolvingComplaint] = useState(null); // complaint object
+  const [loading, setLoading] = useState(true);
   const [resolutionFile, setResolutionFile] = useState(null);
   const [resolutionPreview, setResolutionPreview] = useState(null);
   const [uploadingResolution, setUploadingResolution] = useState(false);
+  const [modalConfig, setModalConfig] = useState({ isOpen: false });
 
   const galleryInputRef = useRef(null);
   const cameraInputRef = useRef(null);
@@ -33,10 +38,12 @@ function AdminComplaints() {
 
   const fetchComplaints = async () => {
     try {
+      setLoading(true);
       const res = await getAllComplaints();
       setComplaints(res.data.complaints);
     } catch (err) {
-      console.log(err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -108,16 +115,25 @@ function AdminComplaints() {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this complaint?")) return;
-
-    try {
-      await deleteComplaint(id);
-      toast.success("Complaint deleted");
-      fetchComplaints();
-    } catch (err) {
-      toast.error("Failed to delete");
-    }
+  const handleDelete = (id) => {
+    setModalConfig({
+      isOpen: true,
+      title: "Delete Complaint",
+      message: "Are you sure you want to delete this complaint? This action cannot be undone.",
+      confirmText: "Delete",
+      type: "danger",
+      onConfirm: async () => {
+        try {
+          await deleteComplaint(id);
+          toast.success("Complaint deleted");
+          fetchComplaints();
+        } catch (err) {
+          toast.error("Failed to delete");
+        }
+        setModalConfig({ isOpen: false });
+      },
+      onCancel: () => setModalConfig({ isOpen: false })
+    });
   };
 
   return (
@@ -147,115 +163,118 @@ function AdminComplaints() {
         <div className="complaint-list-container">
           <h1>Manage Complaints</h1>
 
-          <div style={{ overflowX: "auto" }}>
-            <table className="complaint-table">
-              <thead>
-                <tr>
-                  <th>Student</th>
-                  <th>Title & Description</th>
-                  <th>Category</th>
-                  <th>Evidence Photo</th>
-                  <th>Status</th>
-                  <th>Resolution Proof</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {complaints.map((item) => (
-                  <tr key={item._id}>
-                    <td>
-                      <div>
-                        <strong>{item.raisedBy?.name || "N/A"}</strong>
-                        <br />
-                        <small>{item.raisedBy?.email}</small>
-                        <br />
-                        <small>
-                          Room: {item.roomNumber || item.raisedBy?.roomNumber || "N/A"}
-                        </small>
-                      </div>
-                    </td>
-
-                    <td>
-                      <strong>{item.title}</strong>
-                      <br />
-                      <small style={{ color: "var(--text-muted)" }}>{item.description}</small>
-                    </td>
-
-                    <td>{item.category}</td>
-
-                    {/* Evidence Photo */}
-                    <td>
-                      {item.photo ? (
-                        <div
-                          className="table-photo-thumb"
-                          onClick={() => setActivePhotoModal({ url: item.photo, title: `Evidence: ${item.title}` })}
-                          title="Click to view evidence photo"
-                        >
-                          <img src={item.photo} alt="Evidence" />
-                        </div>
-                      ) : (
-                        <span className="no-photo-badge">None</span>
-                      )}
-                    </td>
-
-                    <td>
-                      <span
-                        className={`status ${item.status
-                          .replace(/\s/g, "")
-                          .toLowerCase()}`}
-                      >
-                        {item.status}
-                      </span>
-                    </td>
-
-                    {/* Resolution Photo */}
-                    <td>
-                      {item.resolutionPhoto ? (
-                        <div
-                          className="table-photo-thumb resolved-thumb"
-                          onClick={() => setActivePhotoModal({ url: item.resolutionPhoto, title: `Proof of Fix: ${item.title}` })}
-                          title="Click to view resolution photo"
-                        >
-                          <img src={item.resolutionPhoto} alt="Resolution" />
-                        </div>
-                      ) : (
-                        <span className="no-photo-badge">None</span>
-                      )}
-                    </td>
-
-                    <td>
-                      <div className="complaint-action">
-                        <select
-                          className="status-select"
-                          value={item.status}
-                          onChange={(e) =>
-                            handleStatusChange(item._id, e.target.value, item)
-                          }
-                        >
-                          <option value="Pending">Pending</option>
-                          <option value="In Progress">In Progress</option>
-                          <option value="Resolved">Resolved</option>
-                          <option value="Rejected">Rejected</option>
-                        </select>
-
-                        {item.status === "Resolved" && (
-                          <button
-                            className="delete-btn"
-                            onClick={() => handleDelete(item._id)}
-                          >
-                            Delete
-                          </button>
-                        )}
-                      </div>
-                    </td>
+          {loading ? (
+            <Loader />
+          ) : (
+            <div style={{ overflowX: "auto" }}>
+              <table className="complaint-table">
+                <thead>
+                  <tr>
+                    <th>Student</th>
+                    <th>Title & Description</th>
+                    <th>Category</th>
+                    <th>Evidence Photo</th>
+                    <th>Status</th>
+                    <th>Resolution Proof</th>
+                    <th>Action</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
 
-          {complaints.length === 0 && <p style={{ textAlign: "center", marginTop: "20px" }}>No complaints found.</p>}
+                <tbody>
+                  {complaints.map((item) => (
+                    <tr key={item._id}>
+                      <td>
+                        <div>
+                          <strong>{item.raisedBy?.name || "N/A"}</strong>
+                          <br />
+                          <small>{item.raisedBy?.email}</small>
+                          <br />
+                          <small>
+                            Room: {item.roomNumber || item.raisedBy?.roomNumber || "N/A"}
+                          </small>
+                        </div>
+                      </td>
+
+                      <td>
+                        <strong>{item.title}</strong>
+                        <br />
+                        <small style={{ color: "var(--text-muted)" }}>{item.description}</small>
+                      </td>
+
+                      <td>{item.category}</td>
+
+                      {/* Evidence Photo */}
+                      <td>
+                        {item.photo ? (
+                          <div
+                            className="table-photo-thumb"
+                            onClick={() => setActivePhotoModal({ url: item.photo, title: `Evidence: ${item.title}` })}
+                            title="Click to view evidence photo"
+                          >
+                            <img src={item.photo} alt="Evidence" />
+                          </div>
+                        ) : (
+                          <span className="no-photo-badge">None</span>
+                        )}
+                      </td>
+
+                      <td>
+                        <span
+                          className={`status ${item.status
+                            .replace(/\s/g, "")
+                            .toLowerCase()}`}
+                        >
+                          {item.status}
+                        </span>
+                      </td>
+
+                      {/* Resolution Photo */}
+                      <td>
+                        {item.resolutionPhoto ? (
+                          <div
+                            className="table-photo-thumb resolved-thumb"
+                            onClick={() => setActivePhotoModal({ url: item.resolutionPhoto, title: `Proof of Fix: ${item.title}` })}
+                            title="Click to view resolution photo"
+                          >
+                            <img src={item.resolutionPhoto} alt="Resolution" />
+                          </div>
+                        ) : (
+                          <span className="no-photo-badge">None</span>
+                        )}
+                      </td>
+
+                      <td>
+                        <div className="complaint-action">
+                          <select
+                            className="status-select"
+                            value={item.status}
+                            onChange={(e) =>
+                              handleStatusChange(item._id, e.target.value, item)
+                            }
+                          >
+                            <option value="Pending">Pending</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Resolved">Resolved</option>
+                            <option value="Rejected">Rejected</option>
+                          </select>
+
+                          {item.status === "Resolved" && user?.role === "admin" && (
+                            <button
+                              className="delete-btn"
+                              onClick={() => handleDelete(item._id)}
+                            >
+                              Delete
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              {complaints.length === 0 && <p style={{ textAlign: "center", marginTop: "20px" }}>No complaints found.</p>}
+            </div>
+          )}
         </div>
 
         {/* Resolution Photo Upload Modal */}
@@ -357,6 +376,7 @@ function AdminComplaints() {
           </div>
         )}
       </div>
+      <ConfirmModal {...modalConfig} />
     </div>
   );
 }

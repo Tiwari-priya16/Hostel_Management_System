@@ -37,6 +37,11 @@ const complaintSchema = new mongoose.Schema(
       required: true,
     },
 
+    hostelBlock: {
+      type: String,
+      required: true,
+    },
+
     raisedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

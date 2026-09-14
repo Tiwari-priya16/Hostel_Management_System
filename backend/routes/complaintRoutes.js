@@ -1,5 +1,5 @@
 const express = require("express");
-const authorizeRoles = require("../middleware/roleMiddleware");
+const { protect, authorizeRoles } = require("../middleware/authMiddleware");
 
 const {
   createComplaint,
@@ -15,8 +15,6 @@ const {
 const {
   validateComplaintStatus,
 } = require("../validators/complaintValidator");
-
-const { protect } = require("../middleware/authMiddleware");
 
 const router = express.Router();
 

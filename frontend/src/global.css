@@ -43,3 +43,21 @@ body {
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
+
+/* Toast positioning shifted for sidebar - only when not on auth pages */
+.toast-container-main.with-sidebar.Toastify__toast-container--top-center {
+  left: calc(50% + 125px) !important;
+  transform: translateX(-50%);
+}
+
+/* Default centered positioning for auth pages */
+.toast-container-main.Toastify__toast-container--top-center:not(.with-sidebar) {
+  left: 50% !important;
+  transform: translateX(-50%);
+}
+
+@media (max-width: 992px) {
+  .toast-container-main.Toastify__toast-container--top-center {
+    left: 50% !important;
+  }
+}

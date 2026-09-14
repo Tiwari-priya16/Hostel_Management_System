@@ -10,11 +10,14 @@ import {
   FaSearch, FaPlus, FaTag, FaTrash, FaUser,
   FaImage, FaCamera, FaTimes, FaSpinner, FaClock
 } from "react-icons/fa";
+import ConfirmModal from "../../components/ConfirmModal";
+import Loader from "../../components/Loader";
 
 function LostFoundChannel({ user, onImageClick }) {
   const [items, setItems] = useState([]);
   const [filterTag, setFilterTag] = useState("ALL"); // ALL, LOST, FOUND
   const [loading, setLoading] = useState(false);
+  const [modalConfig, setModalConfig] = useState({ isOpen: false });
 
   // Post Modal State
   const [showModal, setShowModal] = useState(false);
@@ -110,16 +113,25 @@ function LostFoundChannel({ user, onImageClick }) {
     }
   };
 
-  const handleDeleteItem = async (id) => {
-    if (!window.confirm("Delete this Lost & Found post?")) return;
-
-    try {
-      await deleteCommunityMessage(id);
-      toast.success("Post deleted");
-      setItems(prev => prev.filter(i => i._id !== id));
-    } catch (error) {
-      toast.error("Failed to delete post");
-    }
+  const handleDeleteItem = (id) => {
+    setModalConfig({
+      isOpen: true,
+      title: "Delete Post",
+      message: "Are you sure you want to delete this Lost & Found post?",
+      confirmText: "Delete",
+      type: "danger",
+      onConfirm: async () => {
+        try {
+          await deleteCommunityMessage(id);
+          toast.success("Post deleted");
+          setItems(prev => prev.filter(i => i._id !== id));
+        } catch (error) {
+          toast.error("Failed to delete post");
+        }
+        setModalConfig({ isOpen: false });
+      },
+      onCancel: () => setModalConfig({ isOpen: false })
+    });
   };
 
   return (
@@ -180,10 +192,7 @@ function LostFoundChannel({ user, onImageClick }) {
       </div>
 
       {loading ? (
-        <div className="empty-state-box">
-          <FaSpinner className="spinner" style={{ fontSize: "30px" }} />
-          <p>Loading items...</p>
-        </div>
+        <Loader />
       ) : items.length === 0 ? (
         <div className="empty-state-box">
           <FaSearch style={{ fontSize: "40px", color: "var(--text-muted)", marginBottom: "10px" }} />
@@ -194,7 +203,12 @@ function LostFoundChannel({ user, onImageClick }) {
         <div className="lost-found-grid">
           {items.map((item) => {
             const isOwn = item.sender?._id === user?._id;
-            const canDelete = isOwn || user?.role === "admin" || user?.role === "staff";
+            const isModerator = user?.role === "admin" || user?.role === "warden" || user?.role === "staff";
+
+            // Warden/Staff can delete any post EXCEPT those from Super Admin
+            const canDelete = isOwn ||
+              (user?.role === "admin") ||
+              (isModerator && item.sender?.role !== "admin");
 
             return (
               <div key={item._id} className="lost-found-card">
@@ -362,6 +376,7 @@ function LostFoundChannel({ user, onImageClick }) {
           </div>
         </div>
       )}
+      <ConfirmModal {...modalConfig} />
     </div>
   );
 }

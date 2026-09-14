@@ -4,6 +4,8 @@ import Sidebar from "../../components/sidebar/sidebar";
 import Navbar from "../../components/navbar/Navbar";
 import { applyLeave } from "../../services/leaveService";
 import { toast } from "react-toastify";
+import { FaSpinner } from "react-icons/fa";
+import CustomDatePicker from "../../components/CustomDatePicker";
 
 import "../dashboard/dashboard.css";
 import "./ApplyLeave.css";
@@ -13,32 +15,42 @@ function ApplyLeave() {
 
   const [formData, setFormData] = useState({
     reason: "",
-    fromDate: "",
-    toDate: "",
+    fromDate: null,
+    toDate: null,
   });
 
   const [loading, setLoading] = useState(false);
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
+  // Leave Policy: Only upcoming 30 days allowed
+  const minDate = new Date();
+  const maxDate = new Date();
+  maxDate.setDate(minDate.getDate() + 30);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!formData.fromDate || !formData.toDate) {
+      toast.warning("Please select both dates");
+      return;
+    }
+
     try {
       setLoading(true);
-      await applyLeave(formData);
+      // Format dates to YYYY-MM-DD for the backend
+      const formattedData = {
+        ...formData,
+        fromDate: formData.fromDate.toISOString().split('T')[0],
+        toDate: formData.toDate.toISOString().split('T')[0],
+      };
+
+      await applyLeave(formattedData);
 
       toast.success("Leave applied successfully!");
 
       setFormData({
         reason: "",
-        fromDate: "",
-        toDate: "",
+        fromDate: null,
+        toDate: null,
       });
 
       navigate("/my-leaves");
@@ -67,31 +79,33 @@ function ApplyLeave() {
                 name="reason"
                 placeholder="Reason for leave"
                 value={formData.reason}
-                onChange={handleChange}
+                onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
                 rows="5"
                 required
               />
 
               <label>From Date</label>
-              <input
-                type="date"
-                name="fromDate"
-                value={formData.fromDate}
-                onChange={handleChange}
+              <CustomDatePicker
+                selected={formData.fromDate}
+                onChange={(date) => setFormData({ ...formData, fromDate: date })}
+                placeholderText="Select start date"
+                minDate={minDate}
+                maxDate={maxDate}
                 required
               />
 
               <label>To Date</label>
-              <input
-                type="date"
-                name="toDate"
-                value={formData.toDate}
-                onChange={handleChange}
+              <CustomDatePicker
+                selected={formData.toDate}
+                onChange={(date) => setFormData({ ...formData, toDate: date })}
+                placeholderText="Select end date"
+                minDate={formData.fromDate || minDate}
+                maxDate={maxDate}
                 required
               />
 
-              <button type="submit" disabled={loading}>
-                {loading ? "Applying..." : "Apply Leave"}
+              <button type="submit" disabled={loading} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
+                {loading ? <><FaSpinner className="spinner" /> Applying...</> : "Apply Leave"}
               </button>
 
               <button

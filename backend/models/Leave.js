@@ -24,6 +24,11 @@ const leaveSchema = new mongoose.Schema(
       required: true,
     },
 
+    hostelBlock: {
+      type: String,
+      required: true,
+    },
+
     status: {
       type: String,
       enum: ["Pending", "Approved", "Rejected"],

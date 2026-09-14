@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Sidebar from "../../components/sidebar/sidebar";
 import Navbar from "../../components/navbar/Navbar";
+import Loader from "../../components/Loader";
 import { getMyLeaves } from "../../services/leaveService";
 
 import "./LeaveHistory.css";
@@ -8,6 +9,7 @@ import "../dashboard/dashboard.css";
 
 function LeaveHistory() {
   const [leaves, setLeaves] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchLeaves();
@@ -15,13 +17,13 @@ function LeaveHistory() {
 
   const fetchLeaves = async () => {
     try {
+      setLoading(true);
       const res = await getMyLeaves();
-
-      console.log("Leaves Response:", res.data);
 
       setLeaves(res.data.leaves || []);
     } catch (error) {
-      console.log("Leave Error:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -35,7 +37,9 @@ function LeaveHistory() {
         <div className="leave-history-container">
           <h1>My Leaves</h1>
 
-          {leaves.length === 0 ? (
+          {loading ? (
+            <Loader />
+          ) : leaves.length === 0 ? (
             <p>No leave requests found.</p>
           ) : (
             <div className="table-responsive">

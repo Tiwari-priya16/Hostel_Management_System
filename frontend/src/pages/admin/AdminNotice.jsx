@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import Sidebar from "../../components/sidebar/sidebar";
 import Navbar from "../../components/navbar/Navbar";
 import { toast } from "react-toastify";
+import ConfirmModal from "../../components/ConfirmModal";
 
 import "../dashboard/dashboard.css";
 import "../notice/Notice.css";
@@ -15,10 +16,12 @@ import {
 
 function AdminNotice() {
   const [notices, setNotices] = useState([]);
+  const user = JSON.parse(localStorage.getItem("user"));
 
   const [title, setTitle] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [modalConfig, setModalConfig] = useState({ isOpen: false });
 
   useEffect(() => {
     fetchNotices();
@@ -29,7 +32,6 @@ function AdminNotice() {
       const res = await getNotices();
       setNotices(res.notices || []);
     } catch (error) {
-      console.log(error);
     }
   };
 
@@ -56,16 +58,25 @@ function AdminNotice() {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("Delete this notice?")) return;
-
-    try {
-      await deleteNotice(id);
-      fetchNotices();
-      toast.success("Notice deleted");
-    } catch (error) {
-      toast.error("Failed to delete notice");
-    }
+  const handleDelete = (id) => {
+    setModalConfig({
+      isOpen: true,
+      title: "Delete Notice",
+      message: "Are you sure you want to delete this notice?",
+      confirmText: "Delete",
+      type: "danger",
+      onConfirm: async () => {
+        try {
+          await deleteNotice(id);
+          fetchNotices();
+          toast.success("Notice deleted");
+        } catch (error) {
+          toast.error("Failed to delete notice");
+        }
+        setModalConfig({ isOpen: false });
+      },
+      onCancel: () => setModalConfig({ isOpen: false })
+    });
   };
 
   return (
@@ -133,22 +144,25 @@ function AdminNotice() {
                     {notice.message}
                   </p>
 
-                  <button
-                    className="delete-btn"
-                    onClick={() =>
-                      handleDelete(
-                        notice._id
-                      )
-                    }
-                  >
-                    Delete Notice
-                  </button>
+                  {(user?.role === "admin" || (user?.role === "warden" && notice.postedBy?.role !== "admin")) && (
+                    <button
+                      className="delete-btn"
+                      onClick={() =>
+                        handleDelete(
+                          notice._id
+                        )
+                      }
+                    >
+                      Delete Notice
+                    </button>
+                  )}
                 </div>
               ))
             )}
           </div>
         </div>
       </div>
+      <ConfirmModal {...modalConfig} />
     </div>
   );
 }

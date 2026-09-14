@@ -68,6 +68,24 @@ exports.deleteNotice = async (req, res) => {
       });
     }
 
+    // Role-based deletion logic:
+    // 1. Admin can delete any notice.
+    // 2. Warden/Staff can only delete notices if the notice wasn't posted by an Admin.
+    //    (Or even more strictly: only their own, but user said "cant delete super admin notice")
+
+    if (req.user.role !== "admin") {
+      // Find the user who posted it to check their role
+      const User = require("../models/User");
+      const poster = await User.findById(notice.postedBy);
+
+      if (poster && poster.role === "admin") {
+        return res.status(403).json({
+          success: false,
+          message: "You do not have permission to delete a Super Admin notice",
+        });
+      }
+    }
+
     await notice.deleteOne();
 
     res.status(200).json({

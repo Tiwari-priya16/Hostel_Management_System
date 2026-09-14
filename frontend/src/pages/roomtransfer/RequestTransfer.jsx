@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { applyTransfer } from "../../services/roomTransferService";
 import { toast } from "react-toastify";
+import { FaSpinner } from "react-icons/fa";
 import Sidebar from "../../components/sidebar/sidebar";
 import Navbar from "../../components/navbar/Navbar";
 
@@ -90,8 +91,8 @@ function RequestTransfer() {
               required
             />
 
-            <button type="submit" disabled={loading}>
-              {loading ? "Submitting..." : "Submit Request"}
+            <button type="submit" disabled={loading} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
+              {loading ? <><FaSpinner className="spinner" /> Submitting...</> : "Submit Request"}
             </button>
 
             <button

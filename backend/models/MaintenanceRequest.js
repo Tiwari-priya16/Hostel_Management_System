@@ -7,6 +7,10 @@ const maintenanceRequestSchema = new mongoose.Schema(
       ref: "WashingMachine",
       required: true,
     },
+    hostelBlock: {
+      type: String,
+      required: true,
+    },
     reportedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

@@ -5,24 +5,32 @@ import React, {
 
 import Sidebar from "../../components/sidebar/sidebar";
 import Navbar from "../../components/navbar/Navbar";
+import Loader from "../../components/Loader";
 
 import { getNotices } from "../../services/noticeService";
 
 function NoticeList() {
   const [notices, setNotices] =
     useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchNotices();
   }, []);
 
   const fetchNotices = async () => {
-    const res =
-      await getNotices();
+    try {
+      setLoading(true);
+      const res =
+        await getNotices();
 
-    setNotices(
-      res.notices || []
-    );
+      setNotices(
+        res.notices || []
+      );
+    } catch (error) {
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -37,20 +45,26 @@ function NoticeList() {
             📢 Hostel Notices
           </h1>
 
-          {notices.map(
-            (notice) => (
-              <div
-                key={notice._id}
-                className="notice-card"
-              >
-                <h3>
-                  {notice.title}
-                </h3>
+          {loading ? (
+            <Loader />
+          ) : notices.length === 0 ? (
+            <p>No notices found.</p>
+          ) : (
+            notices.map(
+              (notice) => (
+                <div
+                  key={notice._id}
+                  className="notice-card"
+                >
+                  <h3>
+                    {notice.title}
+                  </h3>
 
-                <p>
-                  {notice.message}
-                </p>
-              </div>
+                  <p>
+                    {notice.message}
+                  </p>
+                </div>
+              )
             )
           )}
         </div>

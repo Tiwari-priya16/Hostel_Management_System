@@ -2,8 +2,10 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { createVisitor } from "../../services/visitorService";
 import { toast } from "react-toastify";
+import { FaSpinner } from "react-icons/fa";
 import Sidebar from "../../components/sidebar/sidebar";
 import Navbar from "../../components/navbar/Navbar";
+import CustomDatePicker from "../../components/CustomDatePicker";
 
 import "../dashboard/dashboard.css";
 import "../leave/ApplyLeave.css";
@@ -15,7 +17,7 @@ function AddVisitor() {
     visitorName: "",
     phone: "",
     relation: "",
-    visitDate: "",
+    visitDate: null,
   });
 
   const [loading, setLoading] = useState(false);
@@ -30,9 +32,19 @@ function AddVisitor() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!formData.visitDate) {
+      toast.warning("Please select a visit date");
+      return;
+    }
+
     try {
       setLoading(true);
-      await createVisitor(formData);
+      const formattedData = {
+        ...formData,
+        visitDate: formData.visitDate.toISOString().split('T')[0],
+      };
+
+      await createVisitor(formattedData);
 
       toast.success("Visitor request submitted");
 
@@ -40,7 +52,7 @@ function AddVisitor() {
         visitorName: "",
         phone: "",
         relation: "",
-        visitDate: "",
+        visitDate: null,
       });
 
       navigate("/visitors/history");
@@ -94,16 +106,16 @@ return (
 
             <label>Visit Date</label>
 
-            <input
-              type="date"
-              name="visitDate"
-              value={formData.visitDate}
-              onChange={handleChange}
+            <CustomDatePicker
+              selected={formData.visitDate}
+              onChange={(date) => setFormData({ ...formData, visitDate: date })}
+              placeholderText="Select visit date"
+              minDate={new Date()}
               required
             />
 
-            <button type="submit" disabled={loading}>
-              {loading ? "Adding..." : "Add Visitor"}
+            <button type="submit" disabled={loading} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
+              {loading ? <><FaSpinner className="spinner" /> Adding...</> : "Add Visitor"}
             </button>
 
             <button

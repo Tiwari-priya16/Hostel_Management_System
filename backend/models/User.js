@@ -55,6 +55,12 @@ profilePic: {
   type: String,
   default: "",
 },
+
+accountStatus: {
+  type: String,
+  enum: ["pending", "approved", "rejected"],
+  default: "approved",
+},
   },
   {
     timestamps: true,

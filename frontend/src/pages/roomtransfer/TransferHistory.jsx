@@ -5,6 +5,7 @@ import React, {
 
 import Sidebar from "../../components/sidebar/sidebar";
 import Navbar from "../../components/navbar/Navbar";
+import Loader from "../../components/Loader";
 
 import "../dashboard/dashboard.css";
 import "../leave/LeaveHistory.css";
@@ -16,6 +17,7 @@ import {
 function TransferHistory() {
   const [transfers, setTransfers] =
     useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchTransfers();
@@ -23,6 +25,7 @@ function TransferHistory() {
 
   const fetchTransfers = async () => {
     try {
+      setLoading(true);
       const res =
         await getMyTransfers();
 
@@ -30,7 +33,8 @@ function TransferHistory() {
         res.transfers || []
       );
     } catch (error) {
-      console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -44,7 +48,9 @@ function TransferHistory() {
       <div className="leave-history-container">
         <h1>My Transfer Requests</h1>
 
-        {transfers.length === 0 ? (
+        {loading ? (
+          <Loader />
+        ) : transfers.length === 0 ? (
           <p>No requests found.</p>
         ) : (
           <div className="table-responsive">

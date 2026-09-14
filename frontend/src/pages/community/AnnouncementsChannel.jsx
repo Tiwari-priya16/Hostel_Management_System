@@ -11,10 +11,13 @@ import {
   FaBullhorn, FaThumbtack, FaPlus, FaTrash, FaUser,
   FaImage, FaCamera, FaTimes, FaSpinner, FaLock
 } from "react-icons/fa";
+import ConfirmModal from "../../components/ConfirmModal";
+import Loader from "../../components/Loader";
 
 function AnnouncementsChannel({ user, onImageClick }) {
   const [announcements, setAnnouncements] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [modalConfig, setModalConfig] = useState({ isOpen: false });
 
   // Create Modal State (Admin)
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -116,16 +119,25 @@ function AnnouncementsChannel({ user, onImageClick }) {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this announcement?")) return;
-
-    try {
-      await deleteCommunityMessage(id);
-      toast.success("Announcement deleted");
-      setAnnouncements(prev => prev.filter(a => a._id !== id));
-    } catch (error) {
-      toast.error("Failed to delete announcement");
-    }
+  const handleDelete = (id) => {
+    setModalConfig({
+      isOpen: true,
+      title: "Delete Announcement",
+      message: "Are you sure you want to delete this official announcement?",
+      confirmText: "Delete",
+      type: "danger",
+      onConfirm: async () => {
+        try {
+          await deleteCommunityMessage(id);
+          toast.success("Announcement deleted");
+          setAnnouncements(prev => prev.filter(a => a._id !== id));
+        } catch (error) {
+          toast.error("Failed to delete announcement");
+        }
+        setModalConfig({ isOpen: false });
+      },
+      onCancel: () => setModalConfig({ isOpen: false })
+    });
   };
 
   return (
@@ -171,10 +183,7 @@ function AnnouncementsChannel({ user, onImageClick }) {
       )}
 
       {loading ? (
-        <div className="empty-state-box">
-          <FaSpinner className="spinner" style={{ fontSize: "30px" }} />
-          <p>Loading announcements...</p>
-        </div>
+        <Loader />
       ) : announcements.length === 0 ? (
         <div className="empty-state-box">
           <FaBullhorn style={{ fontSize: "40px", color: "var(--text-muted)", marginBottom: "10px" }} />
@@ -215,9 +224,11 @@ function AnnouncementsChannel({ user, onImageClick }) {
                     <button onClick={() => handleTogglePin(item._id)}>
                       <FaThumbtack /> {item.isPinned ? "Unpin" : "Pin"}
                     </button>
-                    <button className="delete" onClick={() => handleDelete(item._id)}>
-                      <FaTrash /> Delete
-                    </button>
+                    {(user?.role === "admin" || (user?.role === "warden" && item.sender?.role !== "admin")) && (
+                      <button className="delete" onClick={() => handleDelete(item._id)}>
+                        <FaTrash /> Delete
+                      </button>
+                    )}
                   </div>
                 )}
               </div>
@@ -325,6 +336,7 @@ function AnnouncementsChannel({ user, onImageClick }) {
           </div>
         </div>
       )}
+      <ConfirmModal {...modalConfig} />
     </div>
   );
 }

@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { protect } = require("../middleware/authMiddleware");
-const authorizeRoles = require("../middleware/roleMiddleware");
+const { protect, authorizeRoles } = require("../middleware/authMiddleware");
 const {
   getMessages,
   sendMessage,
@@ -12,6 +11,6 @@ const {
 router.get("/messages", protect, getMessages);
 router.post("/messages", protect, sendMessage);
 router.delete("/messages/:id", protect, deleteMessage);
-router.patch("/messages/:id/pin", protect, authorizeRoles("admin", "staff"), togglePinAnnouncement);
+router.patch("/messages/:id/pin", protect, authorizeRoles("admin", "warden", "staff"), togglePinAnnouncement);
 
 module.exports = router;

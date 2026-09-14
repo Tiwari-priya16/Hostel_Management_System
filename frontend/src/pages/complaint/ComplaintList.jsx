@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Sidebar from "../../components/sidebar/sidebar";
 import Navbar from "../../components/navbar/Navbar";
+import Loader from "../../components/Loader";
 import { getMyComplaints } from "../../services/complaintService";
 import { FaImage, FaCheckCircle, FaTimes } from "react-icons/fa";
 
@@ -9,6 +10,7 @@ import "../dashboard/dashboard.css";
 
 function ComplaintList() {
   const [complaints, setComplaints] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [activePhotoModal, setActivePhotoModal] = useState(null); // { url, title }
 
   useEffect(() => {
@@ -20,7 +22,8 @@ function ComplaintList() {
       const res = await getMyComplaints();
       setComplaints(res.data.complaints);
     } catch (error) {
-      console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -34,85 +37,88 @@ function ComplaintList() {
         <div className="complaint-list-container">
           <h1>My Complaints</h1>
 
-          <div style={{ overflowX: "auto" }}>
-            <table className="complaint-table">
-              <thead>
-                <tr>
-                  <th>Title</th>
-                  <th>Category</th>
-                  <th>Evidence Photo</th>
-                  <th>Status</th>
-                  <th>Resolution Photo</th>
-                  <th>Date</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {complaints.map((item) => (
-                  <tr key={item._id}>
-                    <td>
-                      <strong>{item.title}</strong>
-                      <br />
-                      <small style={{ color: "var(--text-muted)" }}>{item.description}</small>
-                    </td>
-                    <td>{item.category}</td>
-
-                    {/* Evidence Photo */}
-                    <td>
-                      {item.photo ? (
-                        <div
-                          className="table-photo-thumb"
-                          onClick={() => setActivePhotoModal({ url: item.photo, title: `Evidence: ${item.title}` })}
-                          title="Click to view full photo"
-                        >
-                          <img src={item.photo} alt="Evidence" />
-                        </div>
-                      ) : (
-                        <span className="no-photo-badge">None</span>
-                      )}
-                    </td>
-
-                    <td>
-                      <span
-                        className={`status ${item.status
-                          .replace(/\s/g, "")
-                          .toLowerCase()}`}
-                      >
-                        {item.status}
-                      </span>
-                    </td>
-
-                    {/* Resolution Photo */}
-                    <td>
-                      {item.resolutionPhoto ? (
-                        <div
-                          className="table-photo-thumb resolved-thumb"
-                          onClick={() => setActivePhotoModal({ url: item.resolutionPhoto, title: `Proof of Fix: ${item.title}` })}
-                          title="Click to view resolution proof"
-                        >
-                          <img src={item.resolutionPhoto} alt="Resolution" />
-                        </div>
-                      ) : item.status === "Resolved" ? (
-                        <span className="no-photo-badge"><FaCheckCircle style={{ color: "#22c55e" }} /> Fixed</span>
-                      ) : (
-                        <span className="no-photo-badge">Pending</span>
-                      )}
-                    </td>
-
-                    <td>
-                      {new Date(item.createdAt).toLocaleDateString("en-IN", {
-                        day: "numeric",
-                        month: "short",
-                        year: "numeric",
-                      })}
-                    </td>
+          {loading ? (
+            <Loader />
+          ) : (
+            <div style={{ overflowX: "auto" }}>
+              <table className="complaint-table">
+                <thead>
+                  <tr>
+                    <th>Title</th>
+                    <th>Category</th>
+                    <th>Evidence Photo</th>
+                    <th>Status</th>
+                    <th>Resolution Photo</th>
+                    <th>Date</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
 
-          {complaints.length === 0 && <p style={{ textAlign: "center", marginTop: "20px" }}>No complaints found.</p>}
+                <tbody>
+                  {complaints.map((item) => (
+                    <tr key={item._id}>
+                      <td>
+                        <strong>{item.title}</strong>
+                        <br />
+                        <small style={{ color: "var(--text-muted)" }}>{item.description}</small>
+                      </td>
+                      <td>{item.category}</td>
+
+                      {/* Evidence Photo */}
+                      <td>
+                        {item.photo ? (
+                          <div
+                            className="table-photo-thumb"
+                            onClick={() => setActivePhotoModal({ url: item.photo, title: `Evidence: ${item.title}` })}
+                            title="Click to view full photo"
+                          >
+                            <img src={item.photo} alt="Evidence" />
+                          </div>
+                        ) : (
+                          <span className="no-photo-badge">None</span>
+                        )}
+                      </td>
+
+                      <td>
+                        <span
+                          className={`status ${item.status
+                            .replace(/\s/g, "")
+                            .toLowerCase()}`}
+                        >
+                          {item.status}
+                        </span>
+                      </td>
+
+                      {/* Resolution Photo */}
+                      <td>
+                        {item.resolutionPhoto ? (
+                          <div
+                            className="table-photo-thumb resolved-thumb"
+                            onClick={() => setActivePhotoModal({ url: item.resolutionPhoto, title: `Proof of Fix: ${item.title}` })}
+                            title="Click to view resolution proof"
+                          >
+                            <img src={item.resolutionPhoto} alt="Resolution" />
+                          </div>
+                        ) : item.status === "Resolved" ? (
+                          <span className="no-photo-badge"><FaCheckCircle style={{ color: "#22c55e" }} /> Fixed</span>
+                        ) : (
+                          <span className="no-photo-badge">Pending</span>
+                        )}
+                      </td>
+
+                      <td>
+                        {new Date(item.createdAt).toLocaleDateString("en-IN", {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                        })}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              {complaints.length === 0 && <p style={{ textAlign: "center", marginTop: "20px" }}>No complaints found.</p>}
+            </div>
+          )}
         </div>
 
         {/* Full Image Modal Viewer */}

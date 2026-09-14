@@ -20,6 +20,11 @@ const roomTransferSchema = new mongoose.Schema(
       trim: true,
     },
 
+    hostelBlock: {
+      type: String,
+      required: true,
+    },
+
     reason: {
       type: String,
       required: true,

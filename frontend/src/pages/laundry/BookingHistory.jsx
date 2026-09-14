@@ -4,12 +4,15 @@ import Navbar from "../../components/navbar/Navbar";
 import { getMyLaundryBookings, cancelLaundryBooking } from "../../services/laundryService";
 import { toast } from "react-toastify";
 import { FaHistory, FaCalendarAlt, FaClock, FaTimesCircle } from "react-icons/fa";
+import ConfirmModal from "../../components/ConfirmModal";
+import Loader from "../../components/Loader";
 import "../dashboard/dashboard.css";
 import "../leave/LeaveHistory.css";
 
 function BookingHistory() {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [modalConfig, setModalConfig] = useState({ isOpen: false });
 
   useEffect(() => {
     fetchBookings();
@@ -27,15 +30,25 @@ function BookingHistory() {
     }
   };
 
-  const handleCancel = async (id) => {
-    if (!window.confirm("Are you sure you want to cancel this booking?")) return;
-    try {
-      await cancelLaundryBooking(id);
-      toast.success("Booking cancelled successfully");
-      fetchBookings();
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to cancel booking");
-    }
+  const handleCancel = (id) => {
+    setModalConfig({
+      isOpen: true,
+      title: "Cancel Booking",
+      message: "Are you sure you want to cancel this laundry booking?",
+      confirmText: "Cancel Booking",
+      type: "danger",
+      onConfirm: async () => {
+        try {
+          await cancelLaundryBooking(id);
+          toast.success("Booking cancelled successfully");
+          fetchBookings();
+        } catch (error) {
+          toast.error(error.response?.data?.message || "Failed to cancel booking");
+        }
+        setModalConfig({ isOpen: false });
+      },
+      onCancel: () => setModalConfig({ isOpen: false })
+    });
   };
 
   return (
@@ -53,7 +66,7 @@ function BookingHistory() {
           </div>
 
           {loading ? (
-            <p>Loading bookings...</p>
+            <Loader />
           ) : bookings.length === 0 ? (
             <div className="notice-empty">
               <FaHistory style={{ fontSize: '48px', opacity: 0.2, marginBottom: '15px' }} />
@@ -120,6 +133,7 @@ function BookingHistory() {
           )}
         </div>
       </div>
+      <ConfirmModal {...modalConfig} />
     </div>
   );
 }

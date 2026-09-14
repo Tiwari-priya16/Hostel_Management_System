@@ -15,3 +15,15 @@ export const forgotPassword = (data) => {
 export const resetPassword = (data) => {
   return API.post("/auth/reset-password", data);
 };
+
+export const getPendingApprovals = () => {
+  return API.get("/auth/pending-approvals");
+};
+
+export const approveUser = (id) => {
+  return API.put(`/auth/approve/${id}`);
+};
+
+export const rejectUser = (id) => {
+  return API.put(`/auth/reject/${id}`);
+};

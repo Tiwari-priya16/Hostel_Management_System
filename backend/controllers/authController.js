@@ -121,6 +121,10 @@ const registerUser = async (req, res) => {
       ? "Warden Office"
       : roomNumber;
 
+    // Set account status
+    // Warden and Staff require approval
+    const accountStatus = (userRole === "warden" || userRole === "staff") ? "pending" : "approved";
+
     // Create user
     const user = await User.create({
       name,
@@ -130,14 +134,19 @@ const registerUser = async (req, res) => {
       phone,
       roomNumber: userRoom,
       hostelBlock,
+      accountStatus,
     });
 
     user.password = undefined;
 
+    const responseMessage = accountStatus === "pending"
+      ? "Registration successful. Please wait for Admin approval."
+      : "User registered successfully";
+
     res.status(201).json({
       success: true,
-      message: "User registered successfully",
-      token: generateToken(user._id),
+      message: responseMessage,
+      token: accountStatus === "approved" ? generateToken(user._id) : undefined,
       user,
     });
   } catch (error) {
@@ -199,6 +208,21 @@ const loginUser = async (req, res) => {
       });
     }
 
+    // Check account status
+    if (user.accountStatus === "pending") {
+      return res.status(403).json({
+        success: false,
+        message: "Your account is pending approval. Please contact Admin.",
+      });
+    }
+
+    if (user.accountStatus === "rejected") {
+      return res.status(403).json({
+        success: false,
+        message: "Your account request has been rejected.",
+      });
+    }
+
     const isMatch = await bcrypt.compare(
       password,
       user.password
@@ -241,9 +265,19 @@ const updateUserProfile = async (req, res) => {
         user.profilePic = req.body.profilePic;
       }
 
-      if (req.body.password) {
+      // Handle Password Change
+      if (req.body.newPassword) {
+        if (!req.body.currentPassword) {
+          return res.status(400).json({ success: false, message: "Current password is required to set a new one" });
+        }
+
+        const isMatch = await bcrypt.compare(req.body.currentPassword, user.password);
+        if (!isMatch) {
+          return res.status(400).json({ success: false, message: "Incorrect current password" });
+        }
+
         const salt = await bcrypt.genSalt(10);
-        user.password = await bcrypt.hash(req.body.password, salt);
+        user.password = await bcrypt.hash(req.body.newPassword, salt);
       }
 
       const updatedUser = await user.save();
@@ -261,6 +295,41 @@ const updateUserProfile = async (req, res) => {
   }
 };
 
+const getPendingUsers = async (req, res) => {
+  try {
+    const pendingUsers = await User.find({ accountStatus: "pending" }, "-password");
+    res.json({ success: true, users: pendingUsers });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+const approveUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ success: false, message: "User not found" });
+
+    user.accountStatus = "approved";
+    await user.save();
+    res.json({ success: true, message: "User approved successfully" });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+const rejectUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ success: false, message: "User not found" });
+
+    user.accountStatus = "rejected";
+    await user.save();
+    res.json({ success: true, message: "User rejected" });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
@@ -269,4 +338,7 @@ module.exports = {
   updateUserProfile,
   forgotPassword,
   resetPassword,
+  getPendingUsers,
+  approveUser,
+  rejectUser,
 };

@@ -22,6 +22,7 @@ const createComplaint = async (req, res) => {
       category,
       photo: photo || "",
       roomNumber: user.roomNumber,
+      hostelBlock: user.hostelBlock,
       raisedBy: req.user._id,
     });
 
@@ -68,7 +69,9 @@ const getMyComplaints = async (req, res) => {
 
 const getAllComplaints = async (req, res) => {
   try {
-    const complaints = await Complaint.find()
+    const filter = req.user.role === "admin" ? {} : { hostelBlock: req.user.hostelBlock };
+
+    const complaints = await Complaint.find(filter)
       .populate("raisedBy", "name email roomNumber")
       .populate("assignedTo", "name email")
       .sort({ createdAt: -1 });
@@ -213,21 +216,27 @@ const deleteComplaint = async (req, res) => {
 
 const getComplaintAnalytics = async (req, res) => {
   try {
-    const total = await Complaint.countDocuments();
+    const filter = req.user.role === "admin" ? {} : { hostelBlock: req.user.hostelBlock };
+
+    const total = await Complaint.countDocuments(filter);
 
     const pending = await Complaint.countDocuments({
+      ...filter,
       status: "Pending",
     });
 
     const inProgress = await Complaint.countDocuments({
+      ...filter,
       status: "In Progress",
     });
 
     const resolved = await Complaint.countDocuments({
+      ...filter,
       status: "Resolved",
     });
 
     const rejected = await Complaint.countDocuments({
+      ...filter,
       status: "Rejected",
     });
 

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../../components/sidebar/sidebar";
 import Navbar from "../../components/navbar/Navbar";
+import Loader from "../../components/Loader";
 import { getMyComplaints } from "../../services/complaintService";
 import { getMyLeaves } from "../../services/leaveService";
 import { getMyLaundryBookings } from "../../services/laundryService";
@@ -32,6 +33,8 @@ function StuDashboard() {
     roomTransfer: 0,
   });
 
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     fetchDashboardStats();
   }, []);
@@ -60,7 +63,8 @@ function StuDashboard() {
         roomTransfer: transferRes?.transfers?.length || transferRes?.data?.transfers?.length || 0,
       });
     } catch (error) {
-      console.log("Student Dashboard Fetch Error:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -70,63 +74,68 @@ function StuDashboard() {
       <div className="content">
         <Navbar />
         <h1 className="welcome-text">Welcome, {user?.name}</h1>
-        <div className="cards">
-          <div className="card" onClick={() => navigate("/my-complaints")}>
-            <div className="card-icon complaints-icon"><FaClipboardList /></div>
-            <div className="card-info">
-              <h3>Complaints</h3>
-              <p>{stats.complaints}</p>
-            </div>
-          </div>
 
-          <div className="card" onClick={() => navigate("/my-leaves")}>
-            <div className="card-icon leaves-icon"><FaCalendarAlt /></div>
-            <div className="card-info">
-              <h3>Leave Requests</h3>
-              <p>{stats.leaves}</p>
+        {loading ? (
+          <Loader />
+        ) : (
+          <div className="cards">
+            <div className="card" onClick={() => navigate("/my-complaints")}>
+              <div className="card-icon complaints-icon"><FaClipboardList /></div>
+              <div className="card-info">
+                <h3>Complaints</h3>
+                <h2>{stats.complaints}</h2>
+              </div>
             </div>
-          </div>
 
-          <div className="card" onClick={() => navigate("/laundry/history")}>
-            <div className="card-icon laundry-icon"><FaTshirt /></div>
-            <div className="card-info">
-              <h3>Laundry</h3>
-              <p>{stats.laundry}</p>
+            <div className="card" onClick={() => navigate("/my-leaves")}>
+              <div className="card-icon leaves-icon"><FaCalendarAlt /></div>
+              <div className="card-info">
+                <h3>Leave Requests</h3>
+                <h2>{stats.leaves}</h2>
+              </div>
             </div>
-          </div>
 
-          <div className="card" onClick={() => navigate("/visitors/history")}>
-            <div className="card-icon visitors-icon"><FaUsers /></div>
-            <div className="card-info">
-              <h3>Visitors</h3>
-              <p>{stats.visitors}</p>
+            <div className="card" onClick={() => navigate("/laundry/history")}>
+              <div className="card-icon laundry-icon"><FaTshirt /></div>
+              <div className="card-info">
+                <h3>Laundry</h3>
+                <h2>{stats.laundry}</h2>
+              </div>
             </div>
-          </div>
 
-          <div className="card" onClick={() => navigate("/mess")}>
-            <div className="card-icon feedback-icon"><FaUtensils /></div>
-            <div className="card-info">
-              <h3>Mess & Feedback</h3>
-              <p className="card-value-small">Menu</p>
+            <div className="card" onClick={() => navigate("/visitors/history")}>
+              <div className="card-icon visitors-icon"><FaUsers /></div>
+              <div className="card-info">
+                <h3>Visitors</h3>
+                <h2>{stats.visitors}</h2>
+              </div>
             </div>
-          </div>
 
-          <div className="card" onClick={() => navigate("/room-transfer/history")}>
-            <div className="card-icon transfers-icon"><FaExchangeAlt /></div>
-            <div className="card-info">
-              <h3>Room Transfer</h3>
-              <p>{stats.roomTransfer}</p>
+            <div className="card" onClick={() => navigate("/mess")}>
+              <div className="card-icon feedback-icon"><FaUtensils /></div>
+              <div className="card-info">
+                <h3>Mess & Feedback</h3>
+                <h2 className="card-value-small">Menu</h2>
+              </div>
             </div>
-          </div>
 
-          <div className="card" onClick={() => navigate("/gate")}>
-            <div className="card-icon" style={{ background: user?.currentStatus === 'Outside Hostel' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(34, 197, 94, 0.1)', color: user?.currentStatus === 'Outside Hostel' ? '#ef4444' : '#22c55e' }}><FaWalking /></div>
-            <div className="card-info">
-              <h3>Current Status</h3>
-              <p className="card-value-small">{user?.currentStatus || "Inside Hostel"}</p>
+            <div className="card" onClick={() => navigate("/room-transfer/history")}>
+              <div className="card-icon transfers-icon"><FaExchangeAlt /></div>
+              <div className="card-info">
+                <h3>Room Transfer</h3>
+                <h2>{stats.roomTransfer}</h2>
+              </div>
+            </div>
+
+            <div className="card" onClick={() => navigate("/gate")}>
+              <div className="card-icon" style={{ background: user?.currentStatus === 'Outside Hostel' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(34, 197, 94, 0.1)', color: user?.currentStatus === 'Outside Hostel' ? '#ef4444' : '#22c55e' }}><FaWalking /></div>
+              <div className="card-info">
+                <h3>Current Status</h3>
+                <h2 className="card-value-small" style={{ fontSize: '1.2rem' }}>{user?.currentStatus || "Inside Hostel"}</h2>
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

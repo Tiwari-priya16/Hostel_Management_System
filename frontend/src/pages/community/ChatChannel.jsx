@@ -10,6 +10,8 @@ import {
   FaPaperPlane, FaImage, FaCamera, FaTimes, FaTrash,
   FaUser, FaSpinner, FaComments, FaSmile
 } from "react-icons/fa";
+import ConfirmModal from "../../components/ConfirmModal";
+import Loader from "../../components/Loader";
 
 function ChatChannel({ channelType, blockName, user, onImageClick }) {
   const [messages, setMessages] = useState([]);
@@ -19,6 +21,7 @@ function ChatChannel({ channelType, blockName, user, onImageClick }) {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [loading, setLoading] = useState(false);
   const [sending, setSending] = useState(false);
+  const [modalConfig, setModalConfig] = useState({ isOpen: false });
 
   const EMOJI_LIST = ["😀", "😂", "😊", "😍", "👍", "👎", "🔥", "🎉", "💯", "📌", "🔍", "💡", "👏", "🙌", "🙏", "🚀", "📍", "🏠", "🧼", "⚡", "☕", "📢", "❤️", "✨", "🎒", "🔑", "📱", "💻"];
 
@@ -115,16 +118,25 @@ function ChatChannel({ channelType, blockName, user, onImageClick }) {
     }
   };
 
-  const handleDeleteMessage = async (id) => {
-    if (!window.confirm("Delete this message?")) return;
-
-    try {
-      await deleteCommunityMessage(id);
-      toast.success("Message deleted");
-      setMessages(prev => prev.filter(m => m._id !== id));
-    } catch (error) {
-      toast.error("Failed to delete message");
-    }
+  const handleDeleteMessage = (id) => {
+    setModalConfig({
+      isOpen: true,
+      title: "Delete Message",
+      message: "Are you sure you want to delete this message?",
+      confirmText: "Delete",
+      type: "danger",
+      onConfirm: async () => {
+        try {
+          await deleteCommunityMessage(id);
+          toast.success("Message deleted");
+          setMessages(prev => prev.filter(m => m._id !== id));
+        } catch (error) {
+          toast.error("Failed to delete message");
+        }
+        setModalConfig({ isOpen: false });
+      },
+      onCancel: () => setModalConfig({ isOpen: false })
+    });
   };
 
   const formatTimestamp = (dateString) => {
@@ -160,7 +172,9 @@ function ChatChannel({ channelType, blockName, user, onImageClick }) {
       </div>
 
       <div className="chat-messages-area">
-        {messages.length === 0 ? (
+        {loading && messages.length === 0 ? (
+          <Loader />
+        ) : messages.length === 0 ? (
           <div className="empty-state-box" style={{ background: "transparent", border: "none" }}>
             <FaComments style={{ fontSize: "40px", color: "var(--text-muted)", marginBottom: "10px" }} />
             <h3>No messages yet</h3>
@@ -169,7 +183,12 @@ function ChatChannel({ channelType, blockName, user, onImageClick }) {
         ) : (
           messages.map((msg) => {
             const isOwn = msg.sender?._id === user?._id;
-            const canDelete = isOwn || user?.role === "admin" || user?.role === "staff";
+            const isModerator = user?.role === "admin" || user?.role === "warden" || user?.role === "staff";
+
+            // Warden/Staff can delete any message EXCEPT Super Admin's
+            const canDelete = isOwn ||
+              (user?.role === "admin") ||
+              (isModerator && msg.sender?.role !== "admin");
 
             return (
               <div key={msg._id} className={`chat-message-row ${isOwn ? "own-message" : ""}`}>
@@ -285,6 +304,7 @@ function ChatChannel({ channelType, blockName, user, onImageClick }) {
           </button>
         </div>
       </form>
+      <ConfirmModal {...modalConfig} />
     </div>
   );
 }

@@ -7,11 +7,15 @@ import { useNavigate } from "react-router-dom";
 
 import Sidebar from "../../components/sidebar/sidebar";
 import Navbar from "../../components/navbar/Navbar";
+import { FaUserCheck } from "react-icons/fa";
+import Loader from "../../components/Loader";
 
 import {
   getStudents,
   getStaff,
 } from "../../services/userService";
+
+import { getPendingApprovals } from "../../services/authService";
 
 import "../dashboard/dashboard.css";
 
@@ -24,27 +28,25 @@ function AdminUsers() {
   const [staffCount, setStaffCount] =
     useState(0);
 
+  const [pendingCount, setPendingCount] =
+    useState(0);
+
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     fetchCounts();
   }, []);
 
   const fetchCounts = async () => {
     try {
+      setLoading(true);
       const studentsRes =
         await getStudents();
 
       const staffRes =
         await getStaff();
 
-      console.log(
-        "Students:",
-        studentsRes
-      );
-
-      console.log(
-        "Staff:",
-        staffRes
-      );
+      const pendingRes = await getPendingApprovals();
 
       setStudentsCount(
         studentsRes.users?.length ||
@@ -57,8 +59,11 @@ function AdminUsers() {
           staffRes.staff?.length ||
           0
       );
+
+      setPendingCount(pendingRes.data.users?.length || 0);
     } catch (error) {
-      console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -74,69 +79,101 @@ function AdminUsers() {
             Users Management
           </h1>
 
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns:
-                "repeat(auto-fit,minmax(250px,1fr))",
-              gap: "20px",
-              marginTop: "30px",
-            }}
-          >
+          {loading ? (
+            <Loader />
+          ) : (
             <div
-              className="card"
-              onClick={() =>
-                navigate(
-                  "/admin/users/students"
-                )
-              }
+              style={{
+                display: "grid",
+                gridTemplateColumns:
+                  "repeat(auto-fit,minmax(250px,1fr))",
+                gap: "20px",
+                marginTop: "30px",
+              }}
             >
-              <h3>
-                Students Details
-              </h3>
-
-              <h2
-                style={{
-                  color: "#2563eb",
-                  fontSize: "40px",
-                  margin: "10px 0",
-                }}
+              <div
+                className="card"
+                onClick={() =>
+                  navigate(
+                    "/admin/users/students"
+                  )
+                }
               >
-                {studentsCount}
-              </h2>
+                <h3>
+                  Students Details
+                </h3>
 
-              <p>
-                Total Students
-              </p>
-            </div>
+                <h2
+                  style={{
+                    color: "#2563eb",
+                    fontSize: "40px",
+                    margin: "10px 0",
+                  }}
+                >
+                  {studentsCount}
+                </h2>
 
-            <div
-              className="card"
-              onClick={() =>
-                navigate(
-                  "/admin/users/staff"
-                )
-              }
-            >
-              <h3>
-                Staff Details
-              </h3>
+                <p>
+                  Total Students
+                </p>
+              </div>
 
-              <h2
-                style={{
-                  color: "#2563eb",
-                  fontSize: "40px",
-                  margin: "10px 0",
-                }}
+              <div
+                className="card"
+                onClick={() =>
+                  navigate(
+                    "/admin/users/staff"
+                  )
+                }
               >
-                {staffCount}
-              </h2>
+                <h3>
+                  Staff Details
+                </h3>
 
-              <p>
-                Total Staff
-              </p>
+                <h2
+                  style={{
+                    color: "#2563eb",
+                    fontSize: "40px",
+                    margin: "10px 0",
+                  }}
+                >
+                  {staffCount}
+                </h2>
+
+                <p>
+                  Total Staff
+                </p>
+              </div>
+
+              <div
+                className="card"
+                style={{ borderLeftColor: "#f59e0b" }}
+                onClick={() =>
+                  navigate(
+                    "/admin/approvals"
+                  )
+                }
+              >
+                <h3>
+                  Pending Approvals
+                </h3>
+
+                <h2
+                  style={{
+                    color: "#f59e0b",
+                    fontSize: "40px",
+                    margin: "10px 0",
+                  }}
+                >
+                  {pendingCount}
+                </h2>
+
+                <p>
+                  Action Required
+                </p>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>

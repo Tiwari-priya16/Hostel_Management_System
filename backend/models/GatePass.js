@@ -7,6 +7,10 @@ const gatePassSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    hostelBlock: {
+      type: String,
+      required: true,
+    },
     exitTime: {
       type: Date,
       default: Date.now,

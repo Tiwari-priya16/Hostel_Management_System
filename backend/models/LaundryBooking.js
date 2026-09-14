@@ -12,6 +12,10 @@ const laundryBookingSchema = new mongoose.Schema(
       ref: "WashingMachine",
       required: true,
     },
+    hostelBlock: {
+      type: String,
+      required: true,
+    },
     student: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

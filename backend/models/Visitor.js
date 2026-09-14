@@ -17,6 +17,11 @@ const visitorSchema = new mongoose.Schema(
       required: true,
     },
 
+    hostelBlock: {
+      type: String,
+      required: true,
+    },
+
     visitDate: {
       type: Date,
       required: true,

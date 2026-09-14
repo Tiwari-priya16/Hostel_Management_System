@@ -3,6 +3,7 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 const cors = require("cors");
+const rateLimit = require("express-rate-limit");
 const connectDB = require("./config/db");
 
 const authRoutes = require("./routes/authRoutes");
@@ -23,9 +24,19 @@ connectDB();
 
 const app = express();
 
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: {
+    success: false,
+    message: "Too many requests, please try again later."
+  }
+});
+
 app.use(cors());
 app.use(express.json());
-app.use("/api/auth", authRoutes);
+
+app.use("/api/auth", authLimiter, authRoutes);
 app.use("/api/complaints", complaintRoutes);
 app.use("/api/visitors", visitorRoutes);
 app.use("/api/laundry", laundryRoutes);
@@ -43,13 +54,21 @@ app.get("/", (req, res) => {
   res.send("Hostel Management API Running...");
 });
 
+// Global Error Handler
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
+  res.status(statusCode).json({
+    success: false,
+    message: err.message || "Internal Server Error",
+  });
+});
+
 const PORT = process.env.PORT || 5000;
 
 const runLaundryAutomation = require("./utils/laundryAutoJob");
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-
   // Run laundry automation every minute
   setInterval(runLaundryAutomation, 60000);
 });

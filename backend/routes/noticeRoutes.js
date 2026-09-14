@@ -13,11 +13,11 @@ const {
   createNoticeValidation,
 } = require("../validators/noticeValidator");
 
-// Create Notice (Admin)
+// Create Notice
 router.post(
   "/",
   protect,
-  authorizeRoles("admin"),
+  authorizeRoles("admin", "warden", "staff"),
   createNoticeValidation,
   createNotice
 );
@@ -25,11 +25,11 @@ router.post(
 // Get All Notices
 router.get("/", protect, getNotices);
 
-// Delete Notice (Admin)
+// Delete Notice
 router.delete(
   "/:id",
   protect,
-  authorizeRoles("admin"),
+  authorizeRoles("admin", "warden", "staff"),
   deleteNotice
 );
 

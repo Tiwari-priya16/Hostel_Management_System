@@ -3,6 +3,8 @@ import Navbar from "../../components/navbar/Navbar";
 import Sidebar from "../../components/sidebar/sidebar";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import ConfirmModal from "../../components/ConfirmModal";
+import Loader from "../../components/Loader";
 
 import { getComplaintAnalytics } from "../../services/complaintService";
 import { getLeaveAnalytics } from "../../services/leaveService";
@@ -10,6 +12,7 @@ import { getMachines, getAllLaundryBookings } from "../../services/laundryServic
 import { getAllVisitors } from "../../services/visitorService";
 import { getTransferAnalytics } from "../../services/roomTransferService";
 import { getStudents, getStaff } from "../../services/userService";
+import { getPendingApprovals } from "../../services/authService";
 
 import {
   getNoticeCount,
@@ -31,12 +34,14 @@ import {
   FaPlus,
   FaUtensils,
   FaWalking,
+  FaUserCheck,
 } from "react-icons/fa";
 
 import "./AdminDashboard.css";
 
 function AdminDashboard() {
   const navigate = useNavigate();
+  const user = JSON.parse(localStorage.getItem("user"));
 
   const [stats, setStats] = useState({
     complaints: 0,
@@ -48,13 +53,16 @@ function AdminDashboard() {
     laundry: 0,
     users: 0,
     outside: 0,
+    approvals: 0,
   });
 
   const [noticesList, setNoticesList] = useState([]);
   const [showNoticeForm, setShowNoticeForm] = useState(false);
   const [title, setTitle] = useState("");
   const [message, setMessage] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [noticeLoading, setNoticeLoading] = useState(false);
+  const [modalConfig, setModalConfig] = useState({ isOpen: false });
 
   useEffect(() => {
     fetchData();
@@ -66,7 +74,6 @@ function AdminDashboard() {
       const res = await getNotices();
       setNoticesList(res.notices || []);
     } catch (error) {
-      console.log(error);
     }
   };
 
@@ -83,6 +90,7 @@ function AdminDashboard() {
         studentRes,
         staffRes,
         gateRes,
+        pendingRes,
       ] = await Promise.all([
         getComplaintAnalytics(),
         getAllVisitors(),
@@ -94,6 +102,7 @@ function AdminDashboard() {
         getStudents(),
         getStaff(),
         getGateAdminStats(),
+        getPendingApprovals(),
       ]);
 
       setStats({
@@ -106,16 +115,18 @@ function AdminDashboard() {
         roomTransfers: transferRes.analytics?.pending || 0,
         transfers: transferRes.analytics?.total || 0,
         outside: gateRes.stats?.totalOutside || 0,
+        approvals: pendingRes.data.users?.length || 0,
       });
     } catch (error) {
-      console.log("Admin Dashboard Fetch Error:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleNoticeSubmit = async (e) => {
     e.preventDefault();
     try {
-      setLoading(true);
+      setNoticeLoading(true);
       await createNotice({ title, message });
       toast.success("Notice Sent Successfully");
       setTitle("");
@@ -126,20 +137,30 @@ function AdminDashboard() {
     } catch (error) {
       toast.error("Failed to send notice");
     } finally {
-      setLoading(false);
+      setNoticeLoading(false);
     }
   };
 
-  const handleDeleteNotice = async (id) => {
-    if (!window.confirm("Delete this notice?")) return;
-    try {
-      await deleteNotice(id);
-      toast.success("Notice Deleted");
-      fetchNotices();
-      fetchData();
-    } catch (error) {
-      toast.error("Failed to delete");
-    }
+  const handleDeleteNotice = (id) => {
+    setModalConfig({
+      isOpen: true,
+      title: "Delete Notice",
+      message: "Are you sure you want to delete this notice?",
+      confirmText: "Delete",
+      type: "danger",
+      onConfirm: async () => {
+        try {
+          await deleteNotice(id);
+          toast.success("Notice Deleted");
+          fetchNotices();
+          fetchData();
+        } catch (error) {
+          toast.error("Failed to delete");
+        }
+        setModalConfig({ isOpen: false });
+      },
+      onCancel: () => setModalConfig({ isOpen: false })
+    });
   };
 
   return (
@@ -148,79 +169,92 @@ function AdminDashboard() {
       <div className="main-content">
         <Navbar />
         <h1 className="dashboard-title">Admin Dashboard</h1>
-        <div className="stats-grid">
-          <div className="card" onClick={() => navigate("/admin/users")}>
-            <div className="card-icon users-icon"><FaUsers /></div>
-            <div className="card-info">
-              <h3>Total Users</h3>
-              <h2>{stats.users}</h2>
-            </div>
-          </div>
 
-          <div className="card" onClick={() => navigate("/admin/complaints")}>
-            <div className="card-icon complaints-icon"><FaClipboardList /></div>
-            <div className="card-info">
-              <h3>Pending Complaints</h3>
-              <h2>{stats.complaints}</h2>
+        {loading ? (
+          <Loader />
+        ) : (
+          <div className="stats-grid">
+            <div className="card" onClick={() => navigate("/admin/users")}>
+              <div className="card-icon users-icon"><FaUsers /></div>
+              <div className="card-info">
+                <h3>Total Users</h3>
+                <h2>{stats.users}</h2>
+              </div>
             </div>
-          </div>
 
-          <div className="card" onClick={() => navigate("/admin/visitors")}>
-            <div className="card-icon visitors-icon"><FaUsers /></div>
-            <div className="card-info">
-              <h3>Pending Visitors</h3>
-              <h2>{stats.visitors}</h2>
+            <div className="card" onClick={() => navigate("/admin/approvals")} style={{ borderLeftColor: '#f59e0b' }}>
+              <div className="card-icon visitors-icon" style={{ background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b' }}><FaUserCheck /></div>
+              <div className="card-info">
+                <h3>Pending Approvals</h3>
+                <h2>{stats.approvals}</h2>
+              </div>
             </div>
-          </div>
 
-          <div className="card" onClick={() => navigate("/admin/leaves")}>
-            <div className="card-icon leaves-icon"><FaCalendarAlt /></div>
-            <div className="card-info">
-              <h3>Pending Leaves</h3>
-              <h2>{stats.leaves}</h2>
+            <div className="card" onClick={() => navigate("/admin/complaints")}>
+              <div className="card-icon complaints-icon"><FaClipboardList /></div>
+              <div className="card-info">
+                <h3>Pending Complaints</h3>
+                <h2>{stats.complaints}</h2>
+              </div>
             </div>
-          </div>
 
-          <div className="card" onClick={() => navigate("/admin/transfers")}>
-            <div className="card-icon transfers-icon"><FaExchangeAlt /></div>
-            <div className="card-info">
-              <h3>Room Transfers</h3>
-              <h2>{stats.roomTransfers}</h2>
+            <div className="card" onClick={() => navigate("/admin/visitors")}>
+              <div className="card-icon visitors-icon"><FaUsers /></div>
+              <div className="card-info">
+                <h3>Pending Visitors</h3>
+                <h2>{stats.visitors}</h2>
+              </div>
             </div>
-          </div>
 
-          <div className="card" onClick={() => navigate("/admin/gate")}>
-            <div className="card-icon leaves-icon" style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444' }}><FaWalking /></div>
-            <div className="card-info">
-              <h3>Students Outside</h3>
-              <h2>{stats.outside}</h2>
+            <div className="card" onClick={() => navigate("/admin/leaves")}>
+              <div className="card-icon leaves-icon"><FaCalendarAlt /></div>
+              <div className="card-info">
+                <h3>Pending Leaves</h3>
+                <h2>{stats.leaves}</h2>
+              </div>
             </div>
-          </div>
 
-          <div className="card" onClick={() => navigate("/admin/mess")}>
-            <div className="card-icon feedback-icon"><FaUtensils /></div>
-            <div className="card-info">
-              <h3>Mess Analytics</h3>
-              <h2 className="card-value-small">Today</h2>
+            <div className="card" onClick={() => navigate("/admin/transfers")}>
+              <div className="card-icon transfers-icon"><FaExchangeAlt /></div>
+              <div className="card-info">
+                <h3>Room Transfers</h3>
+                <h2>{stats.roomTransfers}</h2>
+              </div>
             </div>
-          </div>
 
-          <div className="card card-notice" onClick={() => setShowNoticeForm(true)}>
-            <div className="card-icon notices-icon"><FaPlus /></div>
-            <div className="card-info">
-              <h3>Create Notice</h3>
-              <h2>{stats.notices}</h2>
+            <div className="card" onClick={() => navigate("/admin/gate")}>
+              <div className="card-icon leaves-icon" style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444' }}><FaWalking /></div>
+              <div className="card-info">
+                <h3>Students Outside</h3>
+                <h2>{stats.outside}</h2>
+              </div>
             </div>
-          </div>
 
-          <div className="card" onClick={() => navigate("/admin/laundry")}>
-            <div className="card-icon laundry-icon"><FaTshirt /></div>
-            <div className="card-info">
-              <h3>Laundry Bookings</h3>
-              <h2>{stats.laundry}</h2>
+            <div className="card" onClick={() => navigate("/admin/mess")}>
+              <div className="card-icon feedback-icon"><FaUtensils /></div>
+              <div className="card-info">
+                <h3>Mess Analytics</h3>
+                <h2 className="card-value-small">Today</h2>
+              </div>
+            </div>
+
+            <div className="card card-notice" onClick={() => setShowNoticeForm(true)}>
+              <div className="card-icon notices-icon"><FaPlus /></div>
+              <div className="card-info">
+                <h3>Create Notice</h3>
+                <h2>{stats.notices}</h2>
+              </div>
+            </div>
+
+            <div className="card" onClick={() => navigate("/admin/laundry")}>
+              <div className="card-icon laundry-icon"><FaTshirt /></div>
+              <div className="card-info">
+                <h3>Laundry Bookings</h3>
+                <h2>{stats.laundry}</h2>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {showNoticeForm && (
           <div className="notice-popup">
@@ -232,7 +266,7 @@ function AdminDashboard() {
               <form onSubmit={handleNoticeSubmit}>
                 <input type="text" placeholder="Notice Title" value={title} onChange={(e) => setTitle(e.target.value)} required />
                 <textarea placeholder="Write Notice..." value={message} onChange={(e) => setMessage(e.target.value)} required />
-                <button type="submit" className="send-btn" disabled={loading}>{loading ? "Sending..." : "Send Notice"}</button>
+                <button type="submit" className="send-btn" disabled={noticeLoading}>{noticeLoading ? "Sending..." : "Send Notice"}</button>
               </form>
               <div className="previous-notis">
                 <h3>Previous Notices</h3>
@@ -246,7 +280,9 @@ function AdminDashboard() {
                           <h4>{n.title}</h4>
                           <small>{new Date(n.createdAt).toLocaleDateString()}</small>
                         </div>
-                        <button className="mini-delete-btn" onClick={() => handleDeleteNotice(n._id)} title="Delete Notice">✕</button>
+                        {(user?.role === "admin" || (user?.role === "warden" && n.postedBy?.role !== "admin")) && (
+                          <button className="mini-delete-btn" onClick={() => handleDeleteNotice(n._id)} title="Delete Notice">✕</button>
+                        )}
                       </div>
                     ))
                   )}
@@ -256,6 +292,7 @@ function AdminDashboard() {
           </div>
         )}
       </div>
+      <ConfirmModal {...modalConfig} />
     </div>
   );
 }

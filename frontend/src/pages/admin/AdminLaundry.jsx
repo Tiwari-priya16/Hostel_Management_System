@@ -15,6 +15,7 @@ import {
 import { toast } from "react-toastify";
 import { FaTshirt, FaTools, FaCalendarAlt, FaCog, FaPlus, FaEdit, FaTrash, FaCheckCircle, FaExclamationCircle } from "react-icons/fa";
 import "./AdminLaundry.css";
+import Loader from "../../components/Loader";
 
 function AdminLaundry() {
   const [activeTab, setActiveTab] = useState("machines"); // machines, bookings, maintenance, settings
@@ -130,132 +131,138 @@ function AdminLaundry() {
           </div>
 
           <div className="admin-content-body">
-            {activeTab === 'machines' && (
-              <div className="machines-panel">
-                <div className="panel-header">
-                  <h3>Managed Washing Machines ({machines.length})</h3>
-                  <button className="add-btn" onClick={() => { setShowMachineModal('add'); setMachineForm({ machineNumber: "", name: "", block: "", floor: "", location: "", status: "FREE" }); }}>
-                    <FaPlus /> Add Machine
-                  </button>
-                </div>
-                <div className="admin-machine-grid">
-                  {machines.map(m => (
-                    <div key={m._id} className={`admin-machine-card status-${m.status}`}>
-                      <div className="m-card-header">
-                        <h4>Machine {m.machineNumber}</h4>
-                        <span className="m-status-pill">{m.status}</span>
-                      </div>
-                      <div className="m-card-details">
-                        <p>{m.name}</p>
-                        <small>{m.block} • Floor {m.floor}</small>
-                      </div>
-                      <div className="m-card-actions">
-                        <button title="Edit" onClick={() => { setShowMachineModal(m); setMachineForm(m); }}><FaEdit /></button>
-                        {m.status === 'FREE' ? (
-                          <button title="Put Under Service" className="warn" onClick={() => handleStatusToggle(m, 'UNDER_SERVICE')}><FaTools /></button>
-                        ) : m.status === 'UNDER_SERVICE' ? (
-                          <button title="Restore to Free" className="success" onClick={() => handleStatusToggle(m, 'FREE')}><FaCheckCircle /></button>
-                        ) : null}
-                        <button title="Mark Out of Service" className="danger" onClick={() => handleStatusToggle(m, 'OUT_OF_SERVICE')}><FaExclamationCircle /></button>
-                      </div>
+            {loading ? (
+              <Loader />
+            ) : (
+              <>
+                {activeTab === 'machines' && (
+                  <div className="machines-panel">
+                    <div className="panel-header">
+                      <h3>Managed Washing Machines ({machines.length})</h3>
+                      <button className="add-btn" onClick={() => { setShowMachineModal('add'); setMachineForm({ machineNumber: "", name: "", block: "", floor: "", location: "", status: "FREE" }); }}>
+                        <FaPlus /> Add Machine
+                      </button>
                     </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'bookings' && (
-              <div className="bookings-panel">
-                <table className="admin-table">
-                  <thead>
-                    <tr>
-                      <th>ID</th>
-                      <th>Student</th>
-                      <th>Room</th>
-                      <th>Machine</th>
-                      <th>Date / Time</th>
-                      <th>Status</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {bookings.map(b => (
-                      <tr key={b._id}>
-                        <td><strong>{b.bookingId}</strong></td>
-                        <td>{b.student?.name}</td>
-                        <td>{b.student?.roomNumber}</td>
-                        <td>#{b.machine?.machineNumber}</td>
-                        <td>{b.date}<br/><small>{b.startTime}-{b.endTime}</small></td>
-                        <td><span className={`status-pill ${b.status}`}>{b.status}</span></td>
-                        <td>
-                          {b.status === 'BOOKED' && (
-                            <button className="table-action-btn danger" onClick={() => cancelLaundryBooking(b._id)}>Cancel</button>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-
-            {activeTab === 'maintenance' && (
-              <div className="maintenance-panel">
-                <table className="admin-table">
-                  <thead>
-                    <tr>
-                      <th>Machine</th>
-                      <th>Issue</th>
-                      <th>Reported By</th>
-                      <th>Date</th>
-                      <th>Status</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {maintenance.map(r => (
-                      <tr key={r._id}>
-                        <td>Machine {r.machine?.machineNumber}</td>
-                        <td><strong>{r.issueType}</strong><br/><small>{r.description}</small></td>
-                        <td>{r.reportedBy?.name} (Room {r.reportedBy?.roomNumber})</td>
-                        <td>{new Date(r.createdAt).toLocaleDateString()}</td>
-                        <td><span className={`status-pill ${r.status}`}>{r.status}</span></td>
-                        <td>
-                          {r.status !== 'RESOLVED' && (
-                            <button className="table-action-btn success" onClick={() => handleResolve(r._id)}>Resolve</button>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-
-            {activeTab === 'settings' && (
-              <div className="settings-panel">
-                <form className="settings-form" onSubmit={handleSettingsSave}>
-                  <div className="form-grid">
-                    <div className="form-group">
-                      <label>Max Advance Booking (Days)</label>
-                      <input type="number" value={settings.advanceBookingDays} onChange={e => setSettings({...settings, advanceBookingDays: e.target.value})} />
-                    </div>
-                    <div className="form-group">
-                      <label>Max Active Bookings Per Student</label>
-                      <input type="number" value={settings.maxActiveBookingsPerStudent} onChange={e => setSettings({...settings, maxActiveBookingsPerStudent: e.target.value})} />
-                    </div>
-                    <div className="form-group">
-                      <label>Cancellation Deadline (Minutes Before)</label>
-                      <input type="number" value={settings.cancellationMinutesBeforeStart} onChange={e => setSettings({...settings, cancellationMinutesBeforeStart: e.target.value})} />
-                    </div>
-                    <div className="form-group">
-                      <label>No-Show Grace Period (Minutes)</label>
-                      <input type="number" value={settings.noShowGraceMinutes} onChange={e => setSettings({...settings, noShowGraceMinutes: e.target.value})} />
+                    <div className="admin-machine-grid">
+                      {machines.map(m => (
+                        <div key={m._id} className={`admin-machine-card status-${m.status}`}>
+                          <div className="m-card-header">
+                            <h4>Machine {m.machineNumber}</h4>
+                            <span className="m-status-pill">{m.status}</span>
+                          </div>
+                          <div className="m-card-details">
+                            <p>{m.name}</p>
+                            <small>{m.block} • Floor {m.floor}</small>
+                          </div>
+                          <div className="m-card-actions">
+                            <button title="Edit" onClick={() => { setShowMachineModal(m); setMachineForm(m); }}><FaEdit /></button>
+                            {m.status === 'FREE' ? (
+                              <button title="Put Under Service" className="warn" onClick={() => handleStatusToggle(m, 'UNDER_SERVICE')}><FaTools /></button>
+                            ) : m.status === 'UNDER_SERVICE' ? (
+                              <button title="Restore to Free" className="success" onClick={() => handleStatusToggle(m, 'FREE')}><FaCheckCircle /></button>
+                            ) : null}
+                            <button title="Mark Out of Service" className="danger" onClick={() => handleStatusToggle(m, 'OUT_OF_SERVICE')}><FaExclamationCircle /></button>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
-                  <button type="submit" className="save-settings-btn">Save Laundry Rules</button>
-                </form>
-              </div>
+                )}
+
+                {activeTab === 'bookings' && (
+                  <div className="bookings-panel">
+                    <table className="admin-table">
+                      <thead>
+                        <tr>
+                          <th>ID</th>
+                          <th>Student</th>
+                          <th>Room</th>
+                          <th>Machine</th>
+                          <th>Date / Time</th>
+                          <th>Status</th>
+                          <th>Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {bookings.map(b => (
+                          <tr key={b._id}>
+                            <td><strong>{b.bookingId}</strong></td>
+                            <td>{b.student?.name}</td>
+                            <td>{b.student?.roomNumber}</td>
+                            <td>#{b.machine?.machineNumber}</td>
+                            <td>{b.date}<br/><small>{b.startTime}-{b.endTime}</small></td>
+                            <td><span className={`status-pill ${b.status}`}>{b.status}</span></td>
+                            <td>
+                              {b.status === 'BOOKED' && (
+                                <button className="table-action-btn danger" onClick={() => cancelLaundryBooking(b._id)}>Cancel</button>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+
+                {activeTab === 'maintenance' && (
+                  <div className="maintenance-panel">
+                    <table className="admin-table">
+                      <thead>
+                        <tr>
+                          <th>Machine</th>
+                          <th>Issue</th>
+                          <th>Reported By</th>
+                          <th>Date</th>
+                          <th>Status</th>
+                          <th>Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {maintenance.map(r => (
+                          <tr key={r._id}>
+                            <td>Machine {r.machine?.machineNumber}</td>
+                            <td><strong>{r.issueType}</strong><br/><small>{r.description}</small></td>
+                            <td>{r.reportedBy?.name} (Room {r.reportedBy?.roomNumber})</td>
+                            <td>{new Date(r.createdAt).toLocaleDateString()}</td>
+                            <td><span className={`status-pill ${r.status}`}>{r.status}</span></td>
+                            <td>
+                              {r.status !== 'RESOLVED' && (
+                                <button className="table-action-btn success" onClick={() => handleResolve(r._id)}>Resolve</button>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+
+                {activeTab === 'settings' && (
+                  <div className="settings-panel">
+                    <form className="settings-form" onSubmit={handleSettingsSave}>
+                      <div className="form-grid">
+                        <div className="form-group">
+                          <label>Max Advance Booking (Days)</label>
+                          <input type="number" value={settings.advanceBookingDays} onChange={e => setSettings({...settings, advanceBookingDays: e.target.value})} />
+                        </div>
+                        <div className="form-group">
+                          <label>Max Active Bookings Per Student</label>
+                          <input type="number" value={settings.maxActiveBookingsPerStudent} onChange={e => setSettings({...settings, maxActiveBookingsPerStudent: e.target.value})} />
+                        </div>
+                        <div className="form-group">
+                          <label>Cancellation Deadline (Minutes Before)</label>
+                          <input type="number" value={settings.cancellationMinutesBeforeStart} onChange={e => setSettings({...settings, cancellationMinutesBeforeStart: e.target.value})} />
+                        </div>
+                        <div className="form-group">
+                          <label>No-Show Grace Period (Minutes)</label>
+                          <input type="number" value={settings.noShowGraceMinutes} onChange={e => setSettings({...settings, noShowGraceMinutes: e.target.value})} />
+                        </div>
+                      </div>
+                      <button type="submit" className="save-settings-btn">Save Laundry Rules</button>
+                    </form>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>

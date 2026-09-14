@@ -133,8 +133,8 @@ const deleteMessage = async (req, res) => {
       return res.status(404).json({ success: false, message: "Message not found" });
     }
 
-    // Students can only delete their OWN messages. Admins/Staff can delete ANY message for moderation.
-    if (req.user.role !== "admin" && req.user.role !== "staff" && message.sender.toString() !== req.user._id.toString()) {
+    // Students can only delete their OWN messages. Admins/Wardens/Staff can delete ANY message for moderation.
+    if (req.user.role !== "admin" && req.user.role !== "warden" && req.user.role !== "staff" && message.sender.toString() !== req.user._id.toString()) {
       return res.status(403).json({ success: false, message: "You can only delete your own messages" });
     }
 

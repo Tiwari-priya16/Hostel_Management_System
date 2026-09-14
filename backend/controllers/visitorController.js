@@ -17,6 +17,7 @@ const createVisitor = async (req, res) => {
       relation,
       visitDate,
       student: req.user._id,
+      hostelBlock: req.user.hostelBlock,
     });
 
     // Notify Student
@@ -59,7 +60,9 @@ const getMyVisitors = async (req, res) => {
 
 const getAllVisitors = async (req, res) => {
   try {
-    const visitors = await Visitor.find()
+    const filter = req.user.role === "admin" ? {} : { hostelBlock: req.user.hostelBlock };
+
+    const visitors = await Visitor.find(filter)
       .populate("student", "name email roomNumber")
       .sort({ createdAt: -1 });
 

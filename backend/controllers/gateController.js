@@ -17,7 +17,8 @@ const recordExit = async (req, res) => {
       student: studentId,
       reason,
       status: "OUT",
-      exitTime: new Date()
+      exitTime: new Date(),
+      hostelBlock: user.hostelBlock,
     });
 
     // Update User status
@@ -69,10 +70,12 @@ const getMyHistory = async (req, res) => {
 
 const getAdminStats = async (req, res) => {
   try {
-    const totalInside = await User.countDocuments({ role: "student", currentStatus: "Inside Hostel" });
-    const totalOutside = await User.countDocuments({ role: "student", currentStatus: "Outside Hostel" });
+    const filter = req.user.role === "admin" ? {} : { hostelBlock: req.user.hostelBlock };
 
-    const currentlyOutsideList = await User.find({ role: "student", currentStatus: "Outside Hostel" })
+    const totalInside = await User.countDocuments({ ...filter, role: "student", currentStatus: "Inside Hostel" });
+    const totalOutside = await User.countDocuments({ ...filter, role: "student", currentStatus: "Outside Hostel" });
+
+    const currentlyOutsideList = await User.find({ ...filter, role: "student", currentStatus: "Outside Hostel" })
       .select("name roomNumber phone hostelBlock");
 
     // Get last exit details for those outside
@@ -97,7 +100,9 @@ const getAdminStats = async (req, res) => {
 
 const getAllHistory = async (req, res) => {
   try {
-    const history = await GatePass.find()
+    const filter = req.user.role === "admin" ? {} : { hostelBlock: req.user.hostelBlock };
+
+    const history = await GatePass.find(filter)
       .populate("student", "name roomNumber phone")
       .sort({ createdAt: -1 });
     res.json({ success: true, history });

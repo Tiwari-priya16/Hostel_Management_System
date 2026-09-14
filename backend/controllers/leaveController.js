@@ -19,6 +19,7 @@ exports.createLeave = async (req, res) => {
       reason: req.body.reason,
       fromDate: req.body.fromDate,
       toDate: req.body.toDate,
+      hostelBlock: req.user.hostelBlock,
     });
 
     // Notify Student
@@ -63,7 +64,9 @@ exports.getMyLeaves = async (req, res) => {
 // Admin: all leaves
 exports.getAllLeaves = async (req, res) => {
   try {
-    const leaves = await Leave.find()
+    const filter = req.user.role === "admin" ? {} : { hostelBlock: req.user.hostelBlock };
+
+    const leaves = await Leave.find(filter)
       .populate("student", "name email roomNumber")
       .populate("approvedBy", "name role")
       .sort({ createdAt: -1 });
@@ -160,10 +163,12 @@ exports.rejectLeave = async (req, res) => {
 // Analytics
 exports.getLeaveAnalytics = async (req, res) => {
   try {
-    const total = await Leave.countDocuments();
-    const pending = await Leave.countDocuments({ status: "Pending" });
-    const approved = await Leave.countDocuments({ status: "Approved" });
-    const rejected = await Leave.countDocuments({ status: "Rejected" });
+    const filter = req.user.role === "admin" ? {} : { hostelBlock: req.user.hostelBlock };
+
+    const total = await Leave.countDocuments(filter);
+    const pending = await Leave.countDocuments({ ...filter, status: "Pending" });
+    const approved = await Leave.countDocuments({ ...filter, status: "Approved" });
+    const rejected = await Leave.countDocuments({ ...filter, status: "Rejected" });
 
     res.status(200).json({
       success: true,

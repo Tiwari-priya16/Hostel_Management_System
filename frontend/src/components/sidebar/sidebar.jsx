@@ -17,6 +17,7 @@ import {
   FaWalking,
   FaComments,
   FaTimes,
+  FaUserCheck,
 } from "react-icons/fa";
 
 function Sidebar() {
@@ -271,6 +272,16 @@ function Sidebar() {
               >
                 <FaUsers />
                 Users
+              </NavLink>
+
+              <NavLink
+                to="/admin/approvals"
+                className={({ isActive }) =>
+                  isActive ? "active-link" : ""
+                }
+              >
+                <FaUserCheck />
+                Pending Approvals
               </NavLink>
 
               <NavLink

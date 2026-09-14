@@ -5,6 +5,7 @@ import React, {
 
 import Sidebar from "../../components/sidebar/sidebar";
 import Navbar from "../../components/navbar/Navbar";
+import Loader from "../../components/Loader";
 
 import "../dashboard/dashboard.css";
 import "../leave/LeaveHistory.css";
@@ -16,6 +17,7 @@ import {
 function VisitorHistory() {
   const [visitors, setVisitors] =
     useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchVisitors();
@@ -23,6 +25,7 @@ function VisitorHistory() {
 
   const fetchVisitors = async () => {
     try {
+      setLoading(true);
       const res =
         await getMyVisitors();
 
@@ -30,7 +33,8 @@ function VisitorHistory() {
         res.visitors || []
       );
     } catch (error) {
-      console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -44,7 +48,9 @@ function VisitorHistory() {
       <div className="leave-history-container">
         <h1>My Visitors</h1>
 
-        {visitors.length === 0 ? (
+        {loading ? (
+          <Loader />
+        ) : visitors.length === 0 ? (
           <p>No visitor requests found.</p>
         ) : (
           <div className="table-responsive">

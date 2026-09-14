@@ -10,11 +10,13 @@ const {
   updateUserProfile,
   forgotPassword,
   resetPassword,
+  getPendingUsers,
+  approveUser,
+  rejectUser,
 } = require("../controllers/authController");
 
 // Middleware
-const { protect } = require("../middleware/authMiddleware");
-const authorizeRoles = require("../middleware/roleMiddleware");
+const { protect, authorizeRoles } = require("../middleware/authMiddleware");
 const validate = require("../middleware/validateMiddleware");
 
 // Validators
@@ -95,6 +97,28 @@ router.get(
   protect,
   authorizeRoles("admin"),
   getStaff
+);
+
+// Account Approval Routes (Admin Only)
+router.get(
+  "/pending-approvals",
+  protect,
+  authorizeRoles("admin"),
+  getPendingUsers
+);
+
+router.put(
+  "/approve/:id",
+  protect,
+  authorizeRoles("admin"),
+  approveUser
+);
+
+router.put(
+  "/reject/:id",
+  protect,
+  authorizeRoles("admin"),
+  rejectUser
 );
 
 module.exports = router;

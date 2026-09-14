@@ -1,5 +1,5 @@
 import React from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -37,11 +37,16 @@ import StudentMess from "./pages/mess/StudentMess";
 import Profile from "./pages/profile/Profile";
 import EntryExit from "./pages/gate/EntryExit";
 import AdminGateControl from "./pages/admin/AdminGateControl";
+import AdminApprovals from "./pages/admin/AdminApprovals";
 import CommunityHub from "./pages/community/CommunityHub";
+import NotFound from "./pages/NotFound";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
+  const location = useLocation();
+  const isAuthPage = ["/", "/register", "/forgot-password"].includes(location.pathname);
+
   return (
     <>
       <ToastContainer
@@ -55,6 +60,7 @@ function App() {
         draggable
         pauseOnHover
         theme="colored"
+        className={`toast-container-main ${!isAuthPage ? "with-sidebar" : ""}`}
       />
       <Routes>
         {/* Authentication Routes */}
@@ -67,7 +73,7 @@ function App() {
         <Route
           path="/dashboard/student"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={["student"]}>
               <StuDashboard />
             </ProtectedRoute>
           }
@@ -76,7 +82,7 @@ function App() {
         <Route
           path="/dashboard/admin"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={["admin"]}>
               <AdminDashboard />
             </ProtectedRoute>
           }
@@ -85,7 +91,7 @@ function App() {
         <Route
           path="/dashboard/staff"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={["staff", "warden"]}>
               <StaffDashboard />
             </ProtectedRoute>
           }
@@ -94,7 +100,7 @@ function App() {
         <Route
           path="/dashboard/warden"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={["staff", "warden"]}>
               <StaffDashboard />
             </ProtectedRoute>
           }
@@ -103,7 +109,7 @@ function App() {
         <Route
           path="/complaints"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={["student"]}>
               <RaiseComplaint />
             </ProtectedRoute>
           }
@@ -112,7 +118,7 @@ function App() {
         <Route
           path="/my-complaints"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={["student"]}>
               <ComplaintList />
             </ProtectedRoute>
           }
@@ -121,7 +127,7 @@ function App() {
         <Route
           path="/leave"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={["student"]}>
               <ApplyLeave />
             </ProtectedRoute>
           }
@@ -130,7 +136,7 @@ function App() {
         <Route
           path="/my-leaves"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={["student"]}>
               <LeaveHistory />
             </ProtectedRoute>
           }
@@ -139,7 +145,7 @@ function App() {
         <Route
           path="/laundry"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={["student"]}>
               <Laundry />
             </ProtectedRoute>
           }
@@ -148,7 +154,7 @@ function App() {
         <Route
           path="/laundry/history"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={["student"]}>
               <BookingHistory />
             </ProtectedRoute>
           }
@@ -157,7 +163,7 @@ function App() {
         <Route
           path="/visitors"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={["student"]}>
               <AddVisitor />
             </ProtectedRoute>
           }
@@ -166,7 +172,7 @@ function App() {
         <Route
           path="/visitors/history"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={["student"]}>
               <VisitorHistory />
             </ProtectedRoute>
           }
@@ -175,7 +181,7 @@ function App() {
         <Route
           path="/room-transfer"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={["student"]}>
               <RequestTransfer />
             </ProtectedRoute>
           }
@@ -184,7 +190,7 @@ function App() {
         <Route
           path="/room-transfer/history"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={["student"]}>
               <TransferHistory />
             </ProtectedRoute>
           }
@@ -193,7 +199,7 @@ function App() {
         <Route
           path="/notices"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={["student"]}>
               <NoticeList />
             </ProtectedRoute>
           }
@@ -202,7 +208,7 @@ function App() {
         <Route
           path="/admin/complaints"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={["admin", "warden", "staff"]}>
               <AdminComplaints />
             </ProtectedRoute>
           }
@@ -211,7 +217,7 @@ function App() {
         <Route
           path="/admin/leaves"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={["admin", "warden"]}>
               <AdminLeaves />
             </ProtectedRoute>
           }
@@ -220,7 +226,7 @@ function App() {
         <Route
           path="/admin/visitors"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={["admin", "warden"]}>
               <AdminVisitors />
             </ProtectedRoute>
           }
@@ -229,7 +235,7 @@ function App() {
         <Route
           path="/admin/notices"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={["admin", "warden"]}>
               <AdminNotice />
             </ProtectedRoute>
           }
@@ -238,7 +244,7 @@ function App() {
         <Route
           path="/admin/laundry"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={["admin", "warden"]}>
               <AdminLaundry />
             </ProtectedRoute>
           }
@@ -247,7 +253,7 @@ function App() {
         <Route
           path="/admin/transfers"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={["admin"]}>
               <AdminTransfers />
             </ProtectedRoute>
           }
@@ -256,7 +262,7 @@ function App() {
         <Route
           path="/admin/users"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={["admin"]}>
               <AdminUsers />
             </ProtectedRoute>
           }
@@ -265,7 +271,7 @@ function App() {
         <Route
           path="/admin/users/students"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={["admin"]}>
               <StudentsDetails />
             </ProtectedRoute>
           }
@@ -274,7 +280,7 @@ function App() {
         <Route
           path="/admin/users/staff"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={["admin"]}>
               <StaffDetails />
             </ProtectedRoute>
           }
@@ -283,7 +289,7 @@ function App() {
         <Route
           path="/admin/mess"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={["admin"]}>
               <AdminMess />
             </ProtectedRoute>
           }
@@ -292,7 +298,7 @@ function App() {
         <Route
           path="/mess"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={["student"]}>
               <StudentMess />
             </ProtectedRoute>
           }
@@ -310,7 +316,7 @@ function App() {
         <Route
           path="/gate"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={["student"]}>
               <EntryExit />
             </ProtectedRoute>
           }
@@ -319,8 +325,17 @@ function App() {
         <Route
           path="/admin/gate"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={["admin", "warden"]}>
               <AdminGateControl />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/approvals"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <AdminApprovals />
             </ProtectedRoute>
           }
         />
@@ -333,6 +348,8 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </>
   );

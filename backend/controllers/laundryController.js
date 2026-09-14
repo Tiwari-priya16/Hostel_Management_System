@@ -32,7 +32,8 @@ const getMachines = async (req, res) => {
     const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
     const todayDate = now.toISOString().split('T')[0];
 
-    const machines = await WashingMachine.find();
+    const filter = req.user.role === "admin" || req.user.role === "student" ? {} : { block: req.user.hostelBlock };
+    const machines = await WashingMachine.find(filter);
 
     // Machine-level live status check (IN_USE only if currently running right now)
     for (let machine of machines) {
@@ -161,6 +162,7 @@ const createBooking = async (req, res) => {
     const booking = await LaundryBooking.create({
       bookingId,
       machine: machineId,
+      hostelBlock: machine.block,
       student: req.user._id,
       date,
       startTime,
@@ -204,7 +206,9 @@ const getAllBookings = async (req, res) => {
   try {
     await cleanupPastBookings();
 
-    const bookings = await LaundryBooking.find()
+    const filter = req.user.role === "admin" ? {} : { hostelBlock: req.user.hostelBlock };
+
+    const bookings = await LaundryBooking.find(filter)
       .populate("machine")
       .populate("student", "name email roomNumber")
       .sort({ createdAt: -1 });
@@ -259,8 +263,12 @@ const cancelBooking = async (req, res) => {
 const reportProblem = async (req, res) => {
   try {
     const { machineId, issueType, description } = req.body;
+    const machine = await WashingMachine.findById(machineId);
+    if (!machine) return res.status(404).json({ success: false, message: "Machine not found" });
+
     const request = await MaintenanceRequest.create({
       machine: machineId,
+      hostelBlock: machine.block,
       reportedBy: req.user._id,
       issueType,
       description
@@ -276,7 +284,9 @@ const reportProblem = async (req, res) => {
 
 const getMaintenanceRequests = async (req, res) => {
   try {
-    const requests = await MaintenanceRequest.find()
+    const filter = req.user.role === "admin" ? {} : { hostelBlock: req.user.hostelBlock };
+
+    const requests = await MaintenanceRequest.find(filter)
       .populate("machine")
       .populate("reportedBy", "name email roomNumber")
       .sort({ createdAt: -1 });
