@@ -160,7 +160,7 @@ const registerUser = async (req, res) => {
 const getStudents = async (req, res) => {
   try {
     const students = await User.find(
-      { role: "student" },
+      { role: "student", accountStatus: "approved" },
       "-password"
     );
 
@@ -179,7 +179,7 @@ const getStudents = async (req, res) => {
 const getStaff = async (req, res) => {
   try {
     const staff = await User.find(
-      { role: { $in: ["staff", "warden"] } },
+      { role: { $in: ["staff", "warden"] }, accountStatus: "approved" },
       "-password"
     );
 
@@ -322,9 +322,10 @@ const rejectUser = async (req, res) => {
     const user = await User.findById(req.params.id);
     if (!user) return res.status(404).json({ success: false, message: "User not found" });
 
-    user.accountStatus = "rejected";
-    await user.save();
-    res.json({ success: true, message: "User rejected" });
+    // Deleting the user entirely on rejection keeps the data clean
+    await User.findByIdAndDelete(req.params.id);
+
+    res.json({ success: true, message: "User registration request rejected and deleted" });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

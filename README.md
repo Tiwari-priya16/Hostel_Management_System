@@ -1,85 +1,171 @@
 # 🏨 HostelSync - Smart Hostel Management System
 
-A robust, enterprise-grade **Full-Stack MERN Application** designed to automate and simplify hostel administration. **HostelSync** provides a seamless interface for Students, Wardens, and Super Administrators to manage everything from complaints and laundry to gate passes and community interactions.
+A production-ready, full-stack **Hostel Management System** built using the **MERN Stack** (MongoDB, Express.js, React, Node.js) with Vite. HostelSync streamlines hostel administration, automates facility reservations, and enhances communication between Students, Wardens, and Super Administrators.
+
+The application features a **3-Tier Role Hierarchy**, secure JWT authentication, real-time OTP email verification, Cloudinary cloud image storage, and a robust administrative approval workflow.
 
 ---
 
-## 🌟 What Makes HostelSync Different?
+## 🌟 Standout Features
 
 - **🔐 3-Tier Security Architecture:** Strict Role-Based Access Control (RBAC) ensuring data privacy. Students can't peek into admin data, and block admins are isolated to their specific hostel blocks.
-- **🛡️ Administrative Gatekeeping:** New Warden/Staff registrations must be manually approved by a Super Admin before they can access any sensitive data.
-- **📍 Multi-Block Isolation:** Wardens only see and manage students, complaints, and laundry for their assigned hostel block, while Super Admins maintain a global "birds-eye" view.
+- **🛡️ Administrative Gatekeeping:** New Warden/Staff registrations must be manually approved by a Super Admin before they can access the system.
+- **📍 Multi-Block Isolation:** Wardens only see and manage students, complaints, and laundry for their assigned hostel block (Block A, B, C, or D).
 - **📅 Policy-Driven Automation:** Smart logic for everything—from 30-day leave application windows to restricted meal feedback timings.
+- **🛡️ Security Hardened:** Implementation of API Rate Limiting to prevent brute-force attacks and Bcrypt password hashing.
 
 ---
 
-## 🚀 Key Modules & Features
+## 🚀 Features
 
-### 👨‍🎓 Student Portal
-- **Dashboard:** Real-time personal stats (Active bookings, Pending complaints, Pass status).
-- **Laundry Hub:** Interactive date-picker for washing machine slot booking with live machine status (`FREE`, `BOOKED`, `IN_USE`).
-- **Pass System:** Apply for Gate Passes and Leave Applications (enforced 30-day upcoming window policy).
-- **Mess Management:** View 7-day master menu and provide meal ratings only *after* the meal time has passed.
-- **Community Hub:** Participate in General Chat, Block-specific groups, and a curated Lost & Found desk.
-- **Profile:** Self-service profile management with Cloudinary image uploads and secure password changing.
+### 👨‍🎓 Student
+- **Secure Authentication:** Login, Register with hostel block assignment, and reset password via 6-digit email OTP.
+- **Personal Profile:** Customize profile details, change passwords with current-password verification, and upload profile photos via Cloudinary.
+- **Complaints Management:** Raise complaints with optional evidence photos (Gallery/Camera) and track resolution with proof photos.
+- **Gate Pass (Entry / Exit):** Digital one-tap hostel exit/entry logging with reason tracking and real-time status updates.
+- **Smart Laundry Reservation:** Reserve washing machine time slots using a custom modern date picker, view live machine statuses (`FREE`, `BOOKED`, `IN_USE`), and report maintenance issues.
+- **Mess & Meal Ratings:** View 7-day master menu, check mess status, and rate meals *only after* the meal time has passed to ensure authentic feedback.
+- **Community Hub:** Participate in General Chat, Block Community groups, and a curated Lost & Found Desk (with `LOST`/`FOUND` tags & photos).
+- **Leave & Room Transfers:** Apply for outstation leaves (within a 30-day upcoming window) and request room transfers.
 
-### 🪪 Warden & Staff Dashboard
-- **Localized Operations:** Filtered view of complaints, leaves, and visitors belonging *only* to their assigned block.
-- **Resolution Center:** Update complaint statuses and upload "Proof of Fix" photos.
-- **Gate Monitoring:** Real-time tracker for students currently outside the hostel.
-- **Broadcasting:** Create hostel-wide notices and pin important announcements in the community hub.
+### 🪪 Warden / Caretaker / Staff
+- **Localized Dashboard:** Real-time metrics filtered by assigned block—including active complaints, pending leaves, and students currently outside past curfew.
+- **Administrative Approvals:** Review, Approve, or Reject student leave and room transfer requests for their specific block.
+- **Gate Monitoring:** Monitor live list of students from their block who are currently outside the hostel.
+- **Resolution Center:** Change complaint statuses and upload "Proof of Fix" resolution photos.
+- **Laundry Care:** Resolve machine reports and manage machines within their assigned block.
+- **Communication:** Publish, pin, and moderate community announcements. (Restricted from deleting Super Admin content).
 
-### 👑 Super Admin Executive Panel
-- **Global Roster:** Manage all users, monitor overall occupancy, and inspect system-wide analytics.
-- **Approval Workflow:** Approve or Reject new staff account requests.
-- **System Config:** Define laundry operating hours, mess menus, and system-wide notice management.
+### ⭐ Super Admin
+- **Full System Control:** Access executive dashboard with master occupancy, global user statistics, and system-wide analytics.
+- **Staff Approval Workflow:** Review and Approve or Reject new Warden/Staff account requests before they gain access.
+- **User Roster Management:** View and manage all active Student, Warden, and Staff accounts across all blocks.
+- **Master Data Editor:** Update the 7-day weekly mess menu and configure hostel-wide laundry operating rules.
+- **Global Governance:** Oversee all room transfers, notices, and system configurations.
 
 ---
 
 ## 🛠 Tech Stack
 
-- **Frontend:** React.js (v19), Vite (v7), React Router (v7), React Toastify, React Icons.
-- **Backend:** Node.js, Express.js, JWT, Bcrypt, Express Rate Limit.
-- **Database:** MongoDB Atlas (NoSQL) with Mongoose ODM.
-- **Storage:** Cloudinary SDK for professional cloud-based image hosting.
-- **Notifications:** Custom internal notification engine + SMTP (Nodemailer) for OTPs.
+### Frontend
+- **React.js (v19)** – Declarative Component-Based UI
+- **Vite (v7)** – Ultra-Fast Build Tool & Dev Server
+- **React Router (v7)** – Client-Side Routing with strict RBAC protection.
+- **Custom UI Components:** Integrated fading-dot loader, modern `react-datepicker`, and custom theme-aware confirmation modals.
+- **Styling:** Custom CSS Variables with native **Light & Dark Theme** support.
+
+### Backend
+- **Node.js & Express.js** – RESTful API Server with global error handling.
+- **MongoDB & Mongoose** – NoSQL Database & Data Modeling.
+- **JWT & Bcrypt** – Secure stateless authentication and password hashing.
+- **Nodemailer** – SMTP Email delivery for OTP verification.
+- **Cloudinary & Multer** – Cloud image storage and stream processing.
+- **Security:** `express-rate-limit` protection and request validation middleware.
 
 ---
 
-## 📂 Project Roadmap (Directory Structure)
+## 📂 Project Structure
 
 ```
 HostelSync/
+│
 ├── backend/
-│   ├── controllers/     # Business logic & Handlers
-│   ├── middleware/      # Auth (JWT) & Security (RBAC/Rate-Limit)
-│   ├── models/          # Data Schemas (Mongoose)
-│   ├── routes/          # API Endpoints structure
-│   └── utils/           # Helper scripts (Email, Cloudinary, Job Cleanups)
-└── frontend/
-    ├── src/
-    │   ├── components/  # Reusable UI (Custom Loader, Modals, DatePicker)
-    │   ├── pages/       # Role-specific dashboard & feature pages
-    │   ├── services/    # API communication layer (Axios)
-    │   └── context/     # Global state & Theme management
+│   ├── config/          # Database & Security configurations
+│   ├── controllers/     # API request handlers (Auth, Complaint, Gate, Laundry, etc.)
+│   ├── middleware/      # Auth, RBAC, Rate-Limit, and Validation logic
+│   ├── models/          # Mongoose Schemas (User, Complaint, Notice, etc.)
+│   ├── routes/          # Express API Endpoints structure
+│   └── utils/           # Helpers (Cloudinary, Email OTP, Job Cleanups)
+│
+├── frontend/
+│   ├── src/
+│   │   ├── components/  # Reusable UI (Loader, ConfirmModal, CustomDatePicker)
+│   │   ├── context/     # Theme & Global State Management
+│   │   ├── pages/       # Role-specific dashboard and feature pages
+│   │   ├── services/    # Axios API communication modules
+│   │   └── global.css   # Dynamic theme variables
+│   └── package.json
+│
+└── README.md
 ```
 
 ---
 
-## ⚙️ Setup & Deployment
+## ⚙️ Installation
 
-### 1. Local Development
-1.  **Clone:** `git clone https://github.com/Tiwari-priya16/Hostel_Management_System.git`
-2.  **Install:** Run `npm install` in both `backend` and `frontend` folders.
-3.  **Env Setup:** Create a `.env` in the backend folder (refer to `.env.example`).
-4.  **Run:** Start the backend with `npm run dev` and frontend with `npm run dev`.
+### 1. Clone the Repository
 
-### 2. Production Deployment
-- **Backend:** Recommended to host on **Render** or **Railway**. Set environment variables for DB and Cloudinary.
-- **Frontend:** Recommended for **Vercel** or **Netlify**. Ensure `VITE_API_URL` points to your deployed backend.
+```bash
+git clone https://github.com/Tiwari-priya16/Hostel_Management_System.git
+cd Hostel_Management_System
+```
+
+---
+
+### 2. Install Dependencies
+
+```bash
+# Install Backend Dependencies
+cd backend
+npm install
+
+# Install Frontend Dependencies
+cd ../frontend
+npm install
+```
+
+---
+
+## 🔐 Environment Variables
+
+Create a `.env` file inside the **`backend`** directory:
+
+```env
+PORT=5000
+MONGO_URI=your_mongodb_atlas_connection_string
+JWT_SECRET=your_jwt_secret_key
+
+# Email Service (Nodemailer OTP)
+EMAIL_USER=your_email@gmail.com
+EMAIL_PASS=your_app_password
+
+# Cloudinary Cloud Storage
+CLOUDINARY_CLOUD_NAME=your_cloudinary_name
+CLOUDINARY_API_KEY=your_cloudinary_key
+CLOUDINARY_API_SECRET=your_cloudinary_secret
+```
+
+---
+
+## ▶️ Running the Project
+
+### Start Backend Server
+
+```bash
+cd backend
+npm run dev
+```
+
+---
+
+### Start Frontend Client
+
+```bash
+cd frontend
+npm run dev
+```
+
+- **Frontend Application:** `http://localhost:5173`
+- **Backend API Server:** `http://localhost:5000`
 
 ---
 
 ## 📄 License & Contact
+
 Developed by **Priya Tiwari** (GitHub: [Tiwari-priya16](https://github.com/Tiwari-priya16/)).
-This project is licensed under the ISC License. For inquiries or contributions, feel free to reach out!
+
+This project is licensed under the ISC License. Intended for educational and administrative demonstration purposes.
+
+---
+
+⭐ If you found this project useful, consider giving it a star on GitHub!
