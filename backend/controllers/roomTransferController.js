@@ -57,7 +57,17 @@ exports.getMyTransfers = async (req, res) => {
 // Admin view all requests
 exports.getAllTransfers = async (req, res) => {
   try {
-    const filter = req.user.role === "admin" ? {} : { hostelBlock: req.user.hostelBlock };
+    let filter = {};
+    if (req.user.role !== "admin" && req.user.hostelBlock) {
+      const block = req.user.hostelBlock;
+      const shortBlock = block.replace("Block ", "");
+      filter = {
+        $or: [
+          { hostelBlock: block },
+          { hostelBlock: shortBlock }
+        ]
+      };
+    }
 
     const transfers = await RoomTransfer.find(filter)
       .populate("student", "name email roomNumber")
@@ -152,7 +162,17 @@ exports.rejectTransfer = async (req, res) => {
 // Analytics
 exports.getAnalytics = async (req, res) => {
   try {
-    const filter = req.user.role === "admin" ? {} : { hostelBlock: req.user.hostelBlock };
+    let filter = {};
+    if (req.user.role !== "admin" && req.user.hostelBlock) {
+      const block = req.user.hostelBlock;
+      const shortBlock = block.replace("Block ", "");
+      filter = {
+        $or: [
+          { hostelBlock: block },
+          { hostelBlock: shortBlock }
+        ]
+      };
+    }
 
     const total = await RoomTransfer.countDocuments(filter);
 

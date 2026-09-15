@@ -286,7 +286,17 @@ function AdminLaundry() {
                 <div className="form-row">
                   <div className="form-group">
                     <label>Block</label>
-                    <input type="text" required value={machineForm.block} onChange={e => setMachineForm({...machineForm, block: e.target.value})} />
+                    <select
+                      required
+                      value={machineForm.block}
+                      onChange={e => setMachineForm({...machineForm, block: e.target.value})}
+                    >
+                      <option value="">Select Block</option>
+                      <option value="Block A">Block A</option>
+                      <option value="Block B">Block B</option>
+                      <option value="Block C">Block C</option>
+                      <option value="Block D">Block D</option>
+                    </select>
                   </div>
                   <div className="form-group">
                     <label>Floor</label>

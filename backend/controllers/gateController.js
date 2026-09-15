@@ -70,7 +70,17 @@ const getMyHistory = async (req, res) => {
 
 const getAdminStats = async (req, res) => {
   try {
-    const filter = req.user.role === "admin" ? {} : { hostelBlock: req.user.hostelBlock };
+    let filter = {};
+    if (req.user.role !== "admin" && req.user.hostelBlock) {
+      const block = req.user.hostelBlock;
+      const shortBlock = block.replace("Block ", "");
+      filter = {
+        $or: [
+          { hostelBlock: block },
+          { hostelBlock: shortBlock }
+        ]
+      };
+    }
 
     const totalInside = await User.countDocuments({ ...filter, role: "student", currentStatus: "Inside Hostel" });
     const totalOutside = await User.countDocuments({ ...filter, role: "student", currentStatus: "Outside Hostel" });
@@ -100,7 +110,17 @@ const getAdminStats = async (req, res) => {
 
 const getAllHistory = async (req, res) => {
   try {
-    const filter = req.user.role === "admin" ? {} : { hostelBlock: req.user.hostelBlock };
+    let filter = {};
+    if (req.user.role !== "admin" && req.user.hostelBlock) {
+      const block = req.user.hostelBlock;
+      const shortBlock = block.replace("Block ", "");
+      filter = {
+        $or: [
+          { hostelBlock: block },
+          { hostelBlock: shortBlock }
+        ]
+      };
+    }
 
     const history = await GatePass.find(filter)
       .populate("student", "name roomNumber phone")

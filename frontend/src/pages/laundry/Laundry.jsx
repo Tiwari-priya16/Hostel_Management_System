@@ -12,6 +12,7 @@ import {
 import { toast } from "react-toastify";
 import { FaTshirt, FaTools, FaCheckCircle, FaExclamationTriangle } from "react-icons/fa";
 import Loader from "../../components/Loader";
+import CustomDatePicker from "../../components/CustomDatePicker";
 import "./Laundry.css";
 
 function Laundry() {
@@ -29,6 +30,7 @@ function Laundry() {
   const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
 
   const [selectedDate, setSelectedDate] = useState(todayDate);
+  const [selectedDateObj, setSelectedDateObj] = useState(new Date());
   const [selectedSlot, setSelectedSlot] = useState("");
   const [bookedSlots, setBookedSlots] = useState([]);
   const [showReportModal, setShowReportModal] = useState(null); // machine object
@@ -213,17 +215,16 @@ function Laundry() {
 
               <div style={{ marginTop: '15px' }}>
                 <label style={{ fontSize: '13px', fontWeight: '600', display: 'block', marginBottom: '5px' }}>Date (Within 24 Hours)</label>
-                <input
-                  type="date"
-                  className="edit-items-area"
-                  style={{ minHeight: 'auto', marginBottom: '15px', width: '100%' }}
-                  value={selectedDate}
-                  min={todayDate}
-                  max={tomorrowDate}
-                  onChange={(e) => {
-                    setSelectedDate(e.target.value);
+                <CustomDatePicker
+                  selected={selectedDateObj}
+                  onChange={(date) => {
+                    setSelectedDateObj(date);
+                    setSelectedDate(date.toISOString().split('T')[0]);
                     setSelectedSlot("");
                   }}
+                  minDate={new Date()}
+                  maxDate={new Date(new Date().setDate(new Date().getDate() + 1))}
+                  required
                 />
               </div>
 
@@ -232,7 +233,8 @@ function Laundry() {
                 {settings?.availableSlots.map(slot => {
                   const [slotStart, slotEnd] = slot.split("-");
                   const isAlreadyBooked = bookedSlots.includes(slot);
-                  const isPassed = (selectedDate === todayDate && slotEnd <= currentTime);
+                  // Strict: Cannot book if slot start time has already passed
+                  const isPassed = (selectedDate === todayDate && slotStart <= currentTime);
                   const isDisabled = isAlreadyBooked || isPassed;
 
                   return (
@@ -244,7 +246,7 @@ function Laundry() {
                       onClick={() => setSelectedSlot(slot)}
                     >
                       {slot}
-                      {isAlreadyBooked ? " (Booked)" : isPassed ? " (Passed)" : ""}
+                      {isAlreadyBooked ? " (Booked)" : isPassed ? " (Started)" : ""}
                     </button>
                   );
                 })}

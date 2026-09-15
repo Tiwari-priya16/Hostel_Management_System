@@ -69,7 +69,17 @@ const getMyComplaints = async (req, res) => {
 
 const getAllComplaints = async (req, res) => {
   try {
-    const filter = req.user.role === "admin" ? {} : { hostelBlock: req.user.hostelBlock };
+    let filter = {};
+    if (req.user.role !== "admin" && req.user.hostelBlock) {
+      const block = req.user.hostelBlock;
+      const shortBlock = block.replace("Block ", "");
+      filter = {
+        $or: [
+          { hostelBlock: block },
+          { hostelBlock: shortBlock }
+        ]
+      };
+    }
 
     const complaints = await Complaint.find(filter)
       .populate("raisedBy", "name email roomNumber")
@@ -216,7 +226,17 @@ const deleteComplaint = async (req, res) => {
 
 const getComplaintAnalytics = async (req, res) => {
   try {
-    const filter = req.user.role === "admin" ? {} : { hostelBlock: req.user.hostelBlock };
+    let filter = {};
+    if (req.user.role !== "admin" && req.user.hostelBlock) {
+      const block = req.user.hostelBlock;
+      const shortBlock = block.replace("Block ", "");
+      filter = {
+        $or: [
+          { hostelBlock: block },
+          { hostelBlock: shortBlock }
+        ]
+      };
+    }
 
     const total = await Complaint.countDocuments(filter);
 

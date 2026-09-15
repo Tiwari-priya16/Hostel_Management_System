@@ -60,7 +60,17 @@ const getMyVisitors = async (req, res) => {
 
 const getAllVisitors = async (req, res) => {
   try {
-    const filter = req.user.role === "admin" ? {} : { hostelBlock: req.user.hostelBlock };
+    let filter = {};
+    if (req.user.role !== "admin" && req.user.hostelBlock) {
+      const block = req.user.hostelBlock;
+      const shortBlock = block.replace("Block ", "");
+      filter = {
+        $or: [
+          { hostelBlock: block },
+          { hostelBlock: shortBlock }
+        ]
+      };
+    }
 
     const visitors = await Visitor.find(filter)
       .populate("student", "name email roomNumber")

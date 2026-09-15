@@ -64,7 +64,17 @@ exports.getMyLeaves = async (req, res) => {
 // Admin: all leaves
 exports.getAllLeaves = async (req, res) => {
   try {
-    const filter = req.user.role === "admin" ? {} : { hostelBlock: req.user.hostelBlock };
+    let filter = {};
+    if (req.user.role !== "admin" && req.user.hostelBlock) {
+      const block = req.user.hostelBlock;
+      const shortBlock = block.replace("Block ", "");
+      filter = {
+        $or: [
+          { hostelBlock: block },
+          { hostelBlock: shortBlock }
+        ]
+      };
+    }
 
     const leaves = await Leave.find(filter)
       .populate("student", "name email roomNumber")
@@ -163,7 +173,17 @@ exports.rejectLeave = async (req, res) => {
 // Analytics
 exports.getLeaveAnalytics = async (req, res) => {
   try {
-    const filter = req.user.role === "admin" ? {} : { hostelBlock: req.user.hostelBlock };
+    let filter = {};
+    if (req.user.role !== "admin" && req.user.hostelBlock) {
+      const block = req.user.hostelBlock;
+      const shortBlock = block.replace("Block ", "");
+      filter = {
+        $or: [
+          { hostelBlock: block },
+          { hostelBlock: shortBlock }
+        ]
+      };
+    }
 
     const total = await Leave.countDocuments(filter);
     const pending = await Leave.countDocuments({ ...filter, status: "Pending" });

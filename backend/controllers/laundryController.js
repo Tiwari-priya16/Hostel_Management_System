@@ -32,7 +32,19 @@ const getMachines = async (req, res) => {
     const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
     const todayDate = now.toISOString().split('T')[0];
 
-    const filter = req.user.role === "admin" || req.user.role === "student" ? {} : { block: req.user.hostelBlock };
+    // Filter by block for everyone except Super Admin
+    let filter = {};
+    if (req.user.role !== "admin" && req.user.hostelBlock) {
+      const block = req.user.hostelBlock;
+      const shortBlock = block.replace("Block ", "");
+      filter = {
+        $or: [
+          { block: block },
+          { block: shortBlock }
+        ]
+      };
+    }
+
     const machines = await WashingMachine.find(filter);
 
     // Machine-level live status check (IN_USE only if currently running right now)
@@ -115,9 +127,9 @@ const createBooking = async (req, res) => {
       return res.status(400).json({ success: false, message: "Cannot book slots for past dates." });
     }
 
-    // 2. Validate Slot Time (If today, cannot book past hours)
-    if (date === todayDate && endTime <= currentTime) {
-      return res.status(400).json({ success: false, message: "This time slot has already passed for today." });
+    // 2. Validate Slot Time (If today, cannot book past hours or already started slots)
+    if (date === todayDate && startTime <= currentTime) {
+      return res.status(400).json({ success: false, message: "This time slot has already started or passed." });
     }
 
     // 3. Validate Machine Status
@@ -206,7 +218,18 @@ const getAllBookings = async (req, res) => {
   try {
     await cleanupPastBookings();
 
-    const filter = req.user.role === "admin" ? {} : { hostelBlock: req.user.hostelBlock };
+    // If warden/staff, only show bookings for their block
+    let filter = {};
+    if (req.user.role !== "admin" && req.user.hostelBlock) {
+      const block = req.user.hostelBlock;
+      const shortBlock = block.replace("Block ", "");
+      filter = {
+        $or: [
+          { hostelBlock: block },
+          { hostelBlock: shortBlock }
+        ]
+      };
+    }
 
     const bookings = await LaundryBooking.find(filter)
       .populate("machine")
@@ -284,7 +307,17 @@ const reportProblem = async (req, res) => {
 
 const getMaintenanceRequests = async (req, res) => {
   try {
-    const filter = req.user.role === "admin" ? {} : { hostelBlock: req.user.hostelBlock };
+    let filter = {};
+    if (req.user.role !== "admin" && req.user.hostelBlock) {
+      const block = req.user.hostelBlock;
+      const shortBlock = block.replace("Block ", "");
+      filter = {
+        $or: [
+          { hostelBlock: block },
+          { hostelBlock: shortBlock }
+        ]
+      };
+    }
 
     const requests = await MaintenanceRequest.find(filter)
       .populate("machine")
